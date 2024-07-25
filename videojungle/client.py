@@ -70,3 +70,24 @@ class Prompts:
     def generate(self, task, parameters):
         return self.client._make_request("POST", "/prompts", json={"task": task, "parameters": parameters})
     
+    def get(self, prompt_id):
+        return self.client._make_request("GET", f"/prompts/{prompt_id}")
+    
+    def delete(self, prompt_id):
+        return self.client._make_request("DELETE", f"/prompts/{prompt_id}")
+    
+class Scripts:
+    def __init__(self, client):
+        self.client = client
+    
+    def list(self, project_id):
+        return self.client._make_request("GET", f"/projects/{project_id}/scripts")
+    
+    def get(self, project_id, script_id):
+        return self.client._make_request("GET", f"/scripts/{project_id}/{script_id}")
+    
+    def create(self, project_id, name, data, inputs):
+        return self.client._make_request("POST", f"/scripts/{project_id}/scripts", json={"name": name, "data": data, "inputs": inputs})
+    
+    def delete(self, project_id, script_id):
+        return self.client._make_request("DELETE", f"/scripts/{project_id}/{script_id}")
