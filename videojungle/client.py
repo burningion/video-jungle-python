@@ -34,3 +34,25 @@ class Projects:
     
     def delete(self, project_id):
         return self.client._make_request("DELETE", f"/projects/{project_id}")
+    
+class VideoFile:
+    def __init__(self, client):
+        self.client = client
+
+    def get(self, video_file_id):
+        return self.client._make_request("GET", f"/video-file/{video_file_id}")
+    
+    def list(self):
+        return self.client._make_request("GET", "/video-file")
+    
+    def delete(self, video_file_id):
+        return self.client._make_request("DELETE", f"/video-file/{video_file_id}")
+    
+    def get_analysis(self, video_file_id):
+        return self.client._make_request("GET", f"/video-file/{video_file_id}/analysis")
+    
+    def create(self, name, filename, upload_method):
+        return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
+    
+    def upload_direct(self, video_file_id, file):
+        return self.client._make_request("POST", f"/video-file/{video_file_id}/upload-video", files={"file": file})
