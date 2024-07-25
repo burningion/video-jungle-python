@@ -56,3 +56,17 @@ class VideoFile:
     
     def upload_direct(self, video_file_id, file):
         return self.client._make_request("POST", f"/video-file/{video_file_id}/upload-video", files={"file": file})
+    
+    def create_analysis(self, video_file_id):
+        return self.client._make_request("POST", f"/video-file/{video_file_id}/analysis")
+
+class Prompts:
+    def __init__(self, client):
+        self.client = client
+    
+    def list(self):
+        return self.client._make_request("GET", "/prompts")
+    
+    def generate(self, task, parameters):
+        return self.client._make_request("POST", "/prompts", json={"task": task, "parameters": parameters})
+    
