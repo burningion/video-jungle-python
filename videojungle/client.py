@@ -22,3 +22,15 @@ class Projects:
 
     def get(self, project_id):
         return self.client._make_request("GET", f"/projects/{project_id}")
+    
+    def list(self):
+        return self.client._make_request("GET", "/projects")
+    
+    def create(self, name, description, prompt_id=None):
+        if prompt_id:
+            return self.client._make_request("POST", "/projects", json={"name": name, "description": description, "prompt_id": prompt_id})
+        else:
+            return self.client._make_request("POST", "/projects", json={"name": name, "description": description})
+    
+    def delete(self, project_id):
+        return self.client._make_request("DELETE", f"/projects/{project_id}")
