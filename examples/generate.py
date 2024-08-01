@@ -1,6 +1,4 @@
-'''
-WIP, not fully implemented
-'''
+# We will generate a video using the VideoJungle API
 import os
 from videojungle import ApiClient
 
@@ -15,3 +13,16 @@ prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the per
 # Create a project
 
 project = vj.projects.create(name="First Project", description="My first project")
+script_id = project['script']['id']
+
+# Generate a video
+
+video = vj.projects.generate(script_id=script_id, 
+                             project_id=project['id'], 
+                             parameters={"zodiac sign": "Aries",
+                                        "lucky number": "7",
+                                        "lucky color": "green"})
+print(video)
+
+# Download the video
+

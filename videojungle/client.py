@@ -1,4 +1,5 @@
 import requests
+from urllib import parse
 
 class ApiClient:
     BASE_URL = "https://api.video-jungle.com"
@@ -9,7 +10,7 @@ class ApiClient:
         self.video_files = VideoFile(self)
         self.prompts = Prompts(self)
         self.scripts = Scripts(self)
-        
+
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
             "Authorization": f"Bearer {self.token}"
@@ -37,6 +38,10 @@ class Projects:
     
     def delete(self, project_id):
         return self.client._make_request("DELETE", f"/projects/{project_id}")
+    
+    def generate(self, project_id, script_id, parameters):
+        parsed_parameters = parse.urlencode(parameters)
+        return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/generate?parameters={parsed_parameters}")
     
 class VideoFile:
     def __init__(self, client):
