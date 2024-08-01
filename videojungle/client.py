@@ -6,7 +6,10 @@ class ApiClient:
     def __init__(self, token):
         self.token = token
         self.projects = Projects(self)
-
+        self.video_files = VideoFile(self)
+        self.prompts = Prompts(self)
+        self.scripts = Scripts(self)
+        
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
             "Authorization": f"Bearer {self.token}"
