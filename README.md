@@ -21,14 +21,15 @@ import os
 # Assumes you've set your API key as an environment variable
 VJ_API_KEY = os.environ['VJ_API_KEY']
 
+# Initialize API client
 vj = ApiClient(token=VJ_API_KEY)
 
 # Define your video generation task, along with variables to pass on generation
 prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the person excited about their future",
                             parameters=["zodiac sign", "lucky number", "lucky color"])
 
-# Create a project to hold generated files
 
+# Create a project to hold generated files
 project = vj.projects.create(name="First Project", description="My first project")
 
 # Get a script for the generation process
