@@ -1,6 +1,5 @@
-# We will generate a video using the VideoJungle API
-import os
 from videojungle import ApiClient
+import os
 
 VJ_API_KEY = os.environ['VJ_API_KEY']
 
