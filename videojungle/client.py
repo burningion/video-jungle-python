@@ -1,5 +1,6 @@
 import requests
 from urllib import parse
+from typing import List
 
 class ApiClient:
     BASE_URL = "https://api.video-jungle.com"
@@ -86,7 +87,7 @@ class Prompts:
     def list(self):
         return self.client._make_request("GET", "/prompts")
     
-    def generate(self, task: str, parameters: list):
+    def generate(self, task: str, parameters: List[str]):
         '''
         Generates a prompt for video generation process
         Parameters is a list of the parameters required by the prompt to generate a video
