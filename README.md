@@ -1,6 +1,14 @@
 # Video Jungle API Client
 
-This is a Python client for the Video Jungle API. It provides a simple interface to interact with the Video Jungle API.
+This is a Python client for the [Video Jungle API](https://docs.video-jungle.com/). 
+
+[Video Jungle](https://www.video-jungle.com/) is a generative video creator. It allows you to generate custom videos via dynamic variables.
+
+Let's say you want to generate daily astrology readings according to your user's astrological sign, lucky number, and lucky color.
+
+Video Jungle allows you to pass in a value for each, and generate a unique video for that specific user.
+
+See below for an example of how to build a generative video workflow using the API.
 
 ## Installation
 
@@ -12,7 +20,7 @@ pip install videojungle
 
 ## Usage
 
-Here's a simple example of how to use the Video Jungle API client:
+Here's a simple example of how to use the Video Jungle API client for the Horoscope example:
 
 ```python
 from videojungle import ApiClient
