@@ -14,7 +14,7 @@ class ApiClient:
 
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
-            "Authorization": f"Bearer {self.token}"
+            "X-API-Key": self.token
         }
         url = f"{self.BASE_URL}/{endpoint.lstrip('/')}"
         response = requests.request(method, url, headers=headers, **kwargs)

@@ -11,7 +11,6 @@ vj = ApiClient(token=VJ_API_KEY)
 prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the person excited about their future",
                             parameters=["zodiac sign", "lucky number", "lucky color"])
 
-
 # Create a project to hold generated files, using our prompt we've generated
 project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt["id"])
 
