@@ -22,7 +22,7 @@ script_id = script["id"]
 print(project["prompts"][0]["parameters"])
 
 # Generate a video from our created prompt with dynamic variables
-video = project.generate(script_id=script_id, 
+video = vj.projects.generate(script_id=script_id, 
                          project_id=project["id"],
                          parameters={"zodiac sign": "Aries",
                                      "lucky number": "7",
