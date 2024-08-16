@@ -40,7 +40,7 @@ prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the per
 project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt["id"])
 
 # Get first script for the generation process
-script = vj.scripts.list(project["script"]["id"])[0]
+script = vj.scripts.list(project["id"])[0]
 script_id = script["id"]
 
 # Print out parameters required for generation
