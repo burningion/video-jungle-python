@@ -28,3 +28,9 @@ video = vj.projects.generate(script_id=script_id,
                                      "lucky number": "7",
                                      "lucky color": "green"})
 print(video)
+
+# Get the video file ID from the generated video
+asset_id = video["asset_id"]
+
+# Save the video file to disk
+video_file = vj.assets.download(asset_id, "generated_horoscope.mp4")

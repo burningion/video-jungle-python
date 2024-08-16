@@ -12,7 +12,7 @@ class ApiClient:
         self.prompts = Prompts(self)
         self.scripts = Scripts(self)
         self.assets = Assets(self)
-        
+
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
             "X-API-Key": self.token
@@ -70,6 +70,18 @@ class Assets:
     
     def delete(self, asset_id: str):
         return self.client._make_request("DELETE", f"/assets/{asset_id}")
+    
+    def download(self, asset_id: str, filename: str):
+        asset = self.client._make_request("GET", f"/assets/{asset_id}")
+        url = asset["download_url"]
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(filename, 'wb') as f:
+                for chunk in response.iter_content(8192):
+                    f.write(chunk)
+            return filename
+        else:
+            raise Exception(f"Failed to download asset: {response.text}")
 
 
     
