@@ -46,7 +46,31 @@ class Projects:
         Parameters is a dictionary of the parameters required by the prompt
         '''
         parsed_parameters = parse.urlencode(parameters)
-        return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/generate?parameters={parsed_parameters}")
+        return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/generate?params={parsed_parameters}")
+    
+class Assets:
+    def __init__(self, client):
+        self.client = client
+    
+    def check(self, asset_id: str):
+        return self.client._make_request("GET", f"/assets/check/{asset_id}")
+    
+    def status(self, asset_id: str):
+        return self.client._make_request("GET", f"/assets/{asset_id}/status")
+
+    def get(self, asset_id: str):
+        return self.client._make_request("GET", f"/assets/{asset_id}")
+    
+    def list_for_project(self, project_id: str):
+        return self.client._make_request("GET", f"/projects/{project_id}/asset")
+    
+    def list_generated_for_project(self, project_id: str):
+        return self.client._make_request("GET", f"/projects/{project_id}/asset/generated")
+    
+    def delete(self, asset_id: str):
+        return self.client._make_request("DELETE", f"/assets/{asset_id}")
+
+
     
 class VideoFile:
     def __init__(self, client):
