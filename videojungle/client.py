@@ -11,7 +11,8 @@ class ApiClient:
         self.video_files = VideoFile(self)
         self.prompts = Prompts(self)
         self.scripts = Scripts(self)
-
+        self.assets = Assets(self)
+        
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
             "X-API-Key": self.token
