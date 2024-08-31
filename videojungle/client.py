@@ -1,17 +1,18 @@
 import requests
 from urllib import parse
 from typing import List
+from .model import VideoFile, Script, Prompt, Project, Asset
 
 class ApiClient:
     BASE_URL = "https://api.video-jungle.com"
 
     def __init__(self, token):
         self.token = token
-        self.projects = Projects(self)
-        self.video_files = VideoFile(self)
-        self.prompts = Prompts(self)
-        self.scripts = Scripts(self)
-        self.assets = Assets(self)
+        self.projects = ProjectsAPI(self)
+        self.video_files = VideoFileAPI(self)
+        self.prompts = PromptsAPI(self)
+        self.scripts = ScriptsAPI(self)
+        self.assets = AssetsAPI(self)
 
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
@@ -21,16 +22,18 @@ class ApiClient:
         response = requests.request(method, url, headers=headers, **kwargs)
         response.raise_for_status()
         return response.json()
-
-class Projects:
+    
+class ProjectsAPI:
     def __init__(self, client):
         self.client = client
 
     def get(self, project_id: str):
-        return self.client._make_request("GET", f"/projects/{project_id}")
+        obj = self.client._make_request("GET", f"/projects/{project_id}")
+        return Project(**obj)
     
     def list(self):
-        return self.client._make_request("GET", "/projects")
+        obj = self.client._make_request("GET", "/projects")
+        return [Project(**project) for project in obj]
     
     def create(self, name: str, description: str, prompt_id=None):
         if prompt_id:
@@ -49,7 +52,7 @@ class Projects:
         parsed_parameters = parse.urlencode(parameters)
         return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/generate?params={parsed_parameters}")
     
-class Assets:
+class AssetsAPI:
     def __init__(self, client):
         self.client = client
     
@@ -60,13 +63,16 @@ class Assets:
         return self.client._make_request("GET", f"/assets/{asset_id}/status")
 
     def get(self, asset_id: str):
-        return self.client._make_request("GET", f"/assets/{asset_id}")
+        obj = self.client._make_request("GET", f"/assets/{asset_id}")
+        return Asset(**obj)
     
     def list_for_project(self, project_id: str):
-        return self.client._make_request("GET", f"/projects/{project_id}/asset")
-    
+        obj = self.client._make_request("GET", f"/projects/{project_id}/asset")
+        return [Asset(**asset) for asset in obj]
+
     def list_generated_for_project(self, project_id: str):
-        return self.client._make_request("GET", f"/projects/{project_id}/asset/generated")
+        obj = self.client._make_request("GET", f"/projects/{project_id}/asset/generated")
+        return [Asset(**asset) for asset in obj]
     
     def delete(self, asset_id: str):
         return self.client._make_request("DELETE", f"/assets/{asset_id}")
@@ -85,15 +91,17 @@ class Assets:
 
 
     
-class VideoFile:
+class VideoFileAPI:
     def __init__(self, client):
         self.client = client
 
     def get(self, video_file_id: str):
-        return self.client._make_request("GET", f"/video-file/{video_file_id}")
+        obj = self.client._make_request("GET", f"/video-file/{video_file_id}")
+        return VideoFile(**obj)
     
     def list(self):
-        return self.client._make_request("GET", "/video-file")
+        obj = self.client._make_request("GET", "/video-file")
+        return [VideoFile(**video_file) for video_file in obj]
     
     def delete(self, video_file_id: str):
         return self.client._make_request("DELETE", f"/video-file/{video_file_id}")
@@ -117,12 +125,13 @@ class VideoFile:
     def create_analysis(self, video_file_id):
         return self.client._make_request("POST", f"/video-file/{video_file_id}/analysis")
 
-class Prompts:
+class PromptsAPI:
     def __init__(self, client):
         self.client = client
     
     def list(self):
-        return self.client._make_request("GET", "/prompts")
+        obj = self.client._make_request("GET", "/prompts")
+        return [Prompt(**prompt) for prompt in obj]
     
     def generate(self, task: str, parameters: List[str]):
         '''
@@ -133,23 +142,27 @@ class Prompts:
         return self.client._make_request("POST", "/prompts", json={"task": task, "parameters": parameters})
     
     def get(self, prompt_id: str):
-        return self.client._make_request("GET", f"/prompts/{prompt_id}")
+        obj = self.client._make_request("GET", f"/prompts/{prompt_id}")
+        return Prompt(**obj)
     
     def delete(self, prompt_id: str):
         return self.client._make_request("DELETE", f"/prompts/{prompt_id}")
     
-class Scripts:
+class ScriptsAPI:
     def __init__(self, client):
         self.client = client
     
     def list(self, project_id: str):
-        return self.client._make_request("GET", f"/projects/{project_id}/scripts")
+        obj = self.client._make_request("GET", f"/projects/{project_id}/scripts")
+        return [Script(**script) for script in obj]
     
     def get(self, project_id: str, script_id: str):
-        return self.client._make_request("GET", f"/scripts/{project_id}/{script_id}")
+        obj = self.client._make_request("GET", f"/scripts/{project_id}/{script_id}")
+        return Script(**obj)
     
     def create(self, project_id: str, name: str, data: dict, inputs: dict):
-        return self.client._make_request("POST", f"/scripts/{project_id}/scripts", json={"name": name, "data": data, "inputs": inputs})
+        obj = self.client._make_request("POST", f"/scripts/{project_id}/scripts", json={"name": name, "data": data, "inputs": inputs})
+        return Script(**obj)
     
     def delete(self, project_id: str, script_id: str):
         return self.client._make_request("DELETE", f"/scripts/{project_id}/{script_id}")

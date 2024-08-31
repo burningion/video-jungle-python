@@ -4,7 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 dependencies = [
-    "requests"
+    "requests",
+    "pydantic"
 ]
 description="A Python client for the Video Jungle API"
 classifiers=[

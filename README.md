@@ -40,19 +40,25 @@ prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the per
 project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt["id"])
 
 # Get first script for the generation process
-script = vj.scripts.list(project["id"])[0]
-script_id = script["id"]
+script = vj.scripts.list(project.id)[0]
+script_id = script.id
 
 # Print out parameters required for generation
-print(project["prompts"][0]["parameters"])
+print(project.prompts[0]["parameters"])
 
 # Generate a video from our created prompt with dynamic variables
 video = vj.projects.generate(script_id=script_id, 
-                         project_id=project["id"],
+                         project_id=project.id,
                          parameters={"zodiac sign": "Aries",
                                      "lucky number": "7",
                                      "lucky color": "green"})
 print(video)
+
+# Get the video file ID from the generated video
+asset_id = video.assets_id
+
+# Save the video file to disk
+video_file = vj.assets.download(asset_id, "generated_horoscope.mp4")
 ```
 
 This example lives in the `examples/` folder.
