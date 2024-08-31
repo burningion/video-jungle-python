@@ -5,27 +5,24 @@ class VideoFile(BaseModel):
     id: str
     filename: str
     name: str
-    description: str
+    description: Optional[str]
     thumbnail: str
     duration: float
-    fps: int
+    fps: float
     owner_id: str
     size: int
     hash: str
     created_at: str
-    recorded_at: str
+    recorded_at: Optional[str]
     key: str
-    analysis: dict
-    embeddings: List[dict]
-
-'''
-'''
+    analysis: List[dict]
+    # embeddings: List[dict]
 
 class Script(BaseModel):
     id: str
     project_id: str
-    value: str
-    inputs: dict
+    value: dict
+    inputs: List[dict]
     name: str
     created_at: str 
 
@@ -36,28 +33,27 @@ class Prompt(BaseModel):
     created_at: str
     parameters: List[str]
     name: str
-    task: str
-
-class Project(BaseModel):
-    id: str
-    name: str
-    description: str
-    data: dict
-    created_at: str
-    owner_id: str
-    asset_count: int
-    assets: List[VideoFile]
-    prompts: List[dict]
-    scripts: List[Script]
+    task: Optional[str]
 
 class Asset(BaseModel):
     id: str
     keyname: str
-    url: str
-    download_url: str
-    project: dict
-    asset_path: str
+    url: Optional[str]
+    download_url: Optional[str]
+    asset_path: Optional[str]
     asset_type: str
     created_at: str
     status: str
     uploaded: bool
+
+class Project(BaseModel):
+    id: str
+    name: str
+    description: Optional[str]
+    data: Optional[str]
+    created_at: str
+    owner_id: str
+    asset_count: int
+    assets: List[Asset]
+    prompts: List[dict]
+    scripts: List[Script]
