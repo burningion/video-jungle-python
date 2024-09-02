@@ -38,9 +38,11 @@ class ProjectsAPI:
     
     def create(self, name: str, description: str, prompt_id=None, generation_method: str = "prompt-to-video"):
         if prompt_id:
-            return self.client._make_request("POST", "/projects", json={"name": name, "description": description, "prompt_id": prompt_id, "data": generation_method})
+            project = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "prompt_id": prompt_id, "data": generation_method})
+            return self.get(project["id"])
         else:
-            return self.client._make_request("POST", "/projects", json={"name": name, "description": description, "data": generation_method})
+            project = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "data": generation_method})
+            return self.get(project["id"])
     
     def delete(self, project_id: str):
         return self.client._make_request("DELETE", f"/projects/{project_id}")
