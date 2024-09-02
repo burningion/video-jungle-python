@@ -11,11 +11,15 @@ vj = ApiClient(token=VJ_API_KEY)
 prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the person excited about their future",
                             parameters=["zodiac sign", "lucky number", "lucky color"])
 
+# Print out the generated prompt
+print(prompt.value)
+
 # Create a project to hold generated files, using our prompt we've generated
 project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt.id)
 
 # Get first script for the generation process
-script = vj.scripts.list(project.id)[0]
+# (Scripts define the video generation method from a prompt)
+script = project.scripts[0]
 script_id = script.id
 
 # Print out parameters required for generation
@@ -30,7 +34,8 @@ video = vj.projects.generate(script_id=script_id,
 print(video)
 
 # Get the video file ID from the generated video
-asset_id = video.assets_id
+asset_id = video["assets_id"]
 
-# Save the video file to disk
+# Save the video file to disk, automatically waits for generation
 video_file = vj.assets.download(asset_id, "generated_horoscope.mp4")
+print(video_file)

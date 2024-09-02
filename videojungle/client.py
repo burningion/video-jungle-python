@@ -2,6 +2,7 @@ import requests
 from urllib import parse
 from typing import List
 from .model import VideoFile, Script, Prompt, Project, Asset
+import time
 
 class ApiClient:
     BASE_URL = "https://api.video-jungle.com"
@@ -78,7 +79,12 @@ class AssetsAPI:
         return self.client._make_request("DELETE", f"/assets/{asset_id}")
     
     def download(self, asset_id: str, filename: str):
-        asset = self.client._make_request("GET", f"/assets/{asset_id}")
+        while True:
+            asset = self.client._make_request("GET", f"/assets/{asset_id}")
+            if asset["uploaded"]:
+                break
+            time.sleep(.5)
+            print("Waiting for asset to be ready...")
         url = asset["download_url"]
         response = requests.get(url, stream=True)
         if response.status_code == 200:
@@ -139,7 +145,14 @@ class PromptsAPI:
         Parameters is a list of the parameters required by the prompt to generate a video
         IE: ["zodiac sign", "lucky number", "lucky color"] for a horoscope reader
         '''
-        return self.client._make_request("POST", "/prompts/generate", json={"task": task, "parameters": parameters})
+        res = self.client._make_request("POST", "/prompts/generate", json={"task": task, "parameters": parameters})
+        while True:
+            prompt = self.get(res["id"])
+            if prompt.value != "generating...":
+                break
+            time.sleep(.2)
+            print("Generating prompt...")
+        return prompt
     
     def get(self, prompt_id: str):
         obj = self.client._make_request("GET", f"/prompts/{prompt_id}")
