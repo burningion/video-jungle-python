@@ -139,7 +139,7 @@ class PromptsAPI:
         Parameters is a list of the parameters required by the prompt to generate a video
         IE: ["zodiac sign", "lucky number", "lucky color"] for a horoscope reader
         '''
-        return self.client._make_request("POST", "/prompts", json={"task": task, "parameters": parameters})
+        return self.client._make_request("POST", "/prompts/generate", json={"task": task, "parameters": parameters})
     
     def get(self, prompt_id: str):
         obj = self.client._make_request("GET", f"/prompts/{prompt_id}")
