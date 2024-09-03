@@ -23,7 +23,7 @@ script = project.scripts[0]
 script_id = script.id
 
 # Print out parameters required for generation
-print(project.prompts[0].parameters)
+print(project.prompts[0]['parameters'])
 
 # Generate a video from our created prompt with dynamic variables
 video = vj.projects.generate(script_id=script_id, 
@@ -34,8 +34,9 @@ video = vj.projects.generate(script_id=script_id,
 print(video)
 
 # Get the video file ID from the generated video
-asset_id = video["assets_id"]
+asset_id = video["asset_id"]
 
 # Save the video file to disk, automatically waits for generation
+print(f"Generating video with asset id: {asset_id}")
 video_file = vj.assets.download(asset_id, "generated_horoscope.mp4")
-print(video_file)
+print(f"Video generated and saved to: {video_file}")
