@@ -9,7 +9,12 @@ vj = ApiClient(token=VJ_API_KEY)
 
 # Define your video generation task, along with variables to pass on generation
 prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the person excited about their future",
-                            parameters=["zodiac sign", "lucky number", "lucky color"])
+                            parameters=["zodiac sign", "lucky number", "date"])
+
+# Alternatively, create your own prompt:
+# prompt = vj.prompts.create(prompt="generate a horoscope for ${ZODIAC SIGN}, with lucky number ${LUCKY NUMBER} on ${DATE}",
+#                            parameters=["ZODIAC SIGN", "LUCKY NUMBER", "DATE"], name="Horoscope Reader", task="a horoscope generator",
+#                            persona="A psychic squid who sees into the future")
 
 # Print out the generated prompt
 print(prompt.value)
@@ -30,7 +35,7 @@ video = vj.projects.generate(script_id=script_id,
                              project_id=project.id,
                              parameters={"zodiac sign": "Aries",
                                          "lucky number": "7",
-                                         "lucky color": "green"})
+                                         "date": "September 3, 2024"})
 print(video)
 
 # Get the video file ID from the generated video

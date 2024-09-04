@@ -141,6 +141,10 @@ class PromptsAPI:
         obj = self.client._make_request("GET", "/prompts")
         return [Prompt(**prompt) for prompt in obj]
     
+    def create(self, prompt: str, parameters: List[str], name: str = "", persona: str = "", task: str = ""):
+        obj = self.client._make_request("POST", "/prompts", json={"value": prompt, "parameters": parameters, "persona": persona, "task": task, "name": name})
+        return Prompt(**obj)
+    
     def generate(self, task: str, parameters: List[str]):
         '''
         Generates a prompt for video generation process
