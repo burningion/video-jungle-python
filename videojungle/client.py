@@ -117,7 +117,7 @@ class VideoFileAPI:
     def get_analysis(self, video_file_id: str):
         return self.client._make_request("GET", f"/video-file/{video_file_id}/analysis")
     
-    def create(self, name: str, filename: str, upload_method: str):
+    def create(self, name: str, filename: str, upload_method: str = "file-no-chunk"):
         '''
         Create a video file
         Expects an upload method of either: 'direct' or 'file-no-chunk'
@@ -125,6 +125,11 @@ class VideoFileAPI:
         'file-no-chunk' expects the video file to be uploaded to Video Jungle via the
         /video-file/{video_file_id}/upload-video endpoint
         '''
+        if upload_method == "file-no-chunk":
+            upload_link = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
+            uploaded = self.client._make_request("POST", f"/video-file/{upload_link['id']}/upload-video", files={"file": filename})
+            return self.get(uploaded["id"])
+        
         return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
     
     def upload_direct(self, video_file_id, file):
