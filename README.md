@@ -44,6 +44,10 @@ prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the per
 # Print out the generated prompt
 print(prompt.value)
 
+# Optionally, list out scripts available as generation methods
+scripts = vj.scripts.list_options()
+print(scripts)
+
 # Create a project to hold generated files, using our prompt we've generated
 project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt.id)
 

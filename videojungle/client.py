@@ -176,6 +176,10 @@ class ScriptsAPI:
     def __init__(self, client):
         self.client = client
     
+    def list_options(self):
+        obj = self.client._make_request("GET", "/scripts")
+        return [Script(**script) for script in obj]
+    
     def list(self, project_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/scripts")
         return [Script(**script) for script in obj]
