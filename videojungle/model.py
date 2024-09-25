@@ -18,6 +18,14 @@ class VideoFile(BaseModel):
     analysis: List[dict]
     # embeddings: List[dict]
 
+class User(BaseModel):
+    id: str
+    email: str
+    name: str
+    avatar: str
+    is_verified: bool
+    is_active: bool
+
 class Script(BaseModel):
     id: str
     project_id: str

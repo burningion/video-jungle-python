@@ -1,7 +1,7 @@
 import requests
 from urllib import parse
 from typing import List
-from .model import VideoFile, Script, Prompt, Project, Asset
+from .model import VideoFile, Script, Prompt, Project, Asset, User
 import time
 
 class ApiClient:
@@ -14,6 +14,7 @@ class ApiClient:
         self.prompts = PromptsAPI(self)
         self.scripts = ScriptsAPI(self)
         self.assets = AssetsAPI(self)
+        self.user_account = UserAPI(self)
 
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
@@ -194,3 +195,11 @@ class ScriptsAPI:
     
     def delete(self, project_id: str, script_id: str):
         return self.client._make_request("DELETE", f"/scripts/{project_id}/{script_id}")
+    
+class UserAPI:
+    def __init__(self, client):
+        self.client = client 
+    
+    def info(self):
+        obj = self.client._make_request("GET", "/users/me")
+        return User(**obj)
