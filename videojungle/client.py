@@ -56,6 +56,13 @@ class ProjectsAPI:
         parsed_parameters = parse.urlencode(parameters)
         return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/generate?params={parsed_parameters}")
     
+    def render_edit(self, project_id: str, create_edit: dict):
+        '''
+        Render a video using the specified project and script
+        Parameters is a dictionary of the parameters required by the prompt
+        '''
+        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit)
+    
 class AssetsAPI:
     def __init__(self, client):
         self.client = client
