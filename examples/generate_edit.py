@@ -8,6 +8,7 @@ VJ_API_KEY = os.environ['VJ_API_KEY']
 vj = ApiClient(token=VJ_API_KEY)
 
 # Let's do a manual video edit
+# Your video edit will need to have your own, appropriate video IDs
 
 video_edit = {
     "video_edit_version": "1.0",
