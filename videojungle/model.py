@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import time
 from uuid import UUID
+
 class VideoFile(BaseModel):
     id: str
     filename: str
