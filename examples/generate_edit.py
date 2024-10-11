@@ -15,55 +15,54 @@ video_edit = {
     "video_output_format": "mp4",
     "video_output_resolution": "1920x1080",
     "video_output_fps": 30.0,
-    "video_output_filename": "my_video_edit.mp4",
+    "video_output_filename": "output_video.mp4",
     "video_series_sequential": [
         {
-            "video_id": "123e4567-e89b-12d3-a456-426614174000",
+            "video_id": "31341e7e-c173-45a7-ab2d-5196c8ec7dea",
             "type": "videofile",
             "video_start_time": "00:00:00",
-            "video_end_time": "00:00:10",
+            "video_end_time": "00:00:04.6",
             "audio_levels": [
                 {
-                    "audio_level": 0.5,
+                    "audio_level": "0.5",
                     "start_time": "00:00:00",
-                    "end_time": "00:00:10"
+                    "end_time": "00:00:04.6"
                 }
             ]
         },
         {
-            "video_id": "123e4567-e89b-12d3-a456-426614174001",
+            "video_id": "d70c41ab-4d27-4e64-846f-22313a05f627",
             "type": "videofile",
-            "video_start_time": "00:00:10",
-            "video_end_time": "00:00:20",
+            "video_start_time": "00:00:00",
+            "video_end_time": "00:00:05.6",
             "audio_levels": [
                 {
-                    "audio_level": 0.7,
-                    "start_time": "00:00:10",
-                    "end_time": "00:00:20"
+                    "audio_level": "0.5",
+                    "start_time": "00:00:00",
+                    "end_time": "00:00:05.6"
+                }
+            ]
+        },
+        {
+            "video_id": "f024b9d6-a255-4a1d-a257-5758dc631c34",
+            "type": "videofile",
+            "video_start_time": "00:00:00",
+            "video_end_time": "00:00:01.6",
+            "audio_levels": [
+                {
+                    "audio_level": "0.5",
+                    "start_time": "00:00:00",
+                    "end_time": "00:00:01.6"
                 }
             ]
         }
     ],
-    "audio_overlay": [
-        {
-            "audio_id": "123e4567-e89b-12d3-a456-426614174002",
-            "type": "audio",
-            "audio_start_time": "00:00:00",
-            "audio_end_time": "00:00:20",
-            "audio_levels": [
-                {
-                    "audio_level": 0.5,
-                    "start_time": "00:00:00",
-                    "end_time": "00:00:20"
-                }
-            ]
-        }
-    ]
+    "audio_overlay": []
 }
 
 # Create the video edit, must be associated with a project
 
-project_id = "123e4567-e89b-12d3-a456-426614174003"
+project_id = "a9c7c17a-cb15-40a8-9ee3-617922c8a827"
 
 # Edit will be an asset, with a url we can check
 

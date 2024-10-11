@@ -104,8 +104,6 @@ class AssetsAPI:
             return filename
         else:
             raise Exception(f"Failed to download asset: {response.text}")
-
-
     
 class VideoFileAPI:
     def __init__(self, client):
