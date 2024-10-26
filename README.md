@@ -63,7 +63,7 @@ print(project.prompts[0]['parameters'])
 video = vj.projects.generate(script_id=script_id, 
                              project_id=project.id,
                              parameters={"zodiac sign": "Aries",
-                                         "lucky number": "7",
+                                         "lucky number": "7", # parameters are always strings
                                          "date": "September 3, 2024"})
 print(video)
 
