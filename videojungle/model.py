@@ -8,11 +8,11 @@ class VideoFile(BaseModel):
     filename: str
     name: str
     description: Optional[str]
-    thumbnail: str
-    duration: float
-    fps: float
+    thumbnail: Optional[str]
+    duration: Optional[float]
+    fps: Optional[float]
     owner_id: str
-    size: int
+    size: Optional[int]
     hash: str
     created_at: str
     recorded_at: Optional[str]
