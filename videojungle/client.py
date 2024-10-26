@@ -126,7 +126,8 @@ class VideoFileAPI:
     def create(self, name: str, filename: str, upload_method: str = "file-no-chunk"):
         '''
         Create a video file
-        Expects an upload method of either: 'direct' or 'file-no-chunk'
+        Expects an upload method of either: 'url', 'direct', or 'file-no-chunk'
+        'url' downloads the video file from a URL
         'direct' returns a signed AWS URL to upload the video file
         'file-no-chunk' expects the video file to be uploaded to Video Jungle via the
         /video-file/{video_file_id}/upload-video endpoint
@@ -135,6 +136,9 @@ class VideoFileAPI:
             upload_link = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
             uploaded = self.client._make_request("POST", f"/video-file/{upload_link['id']}/upload-video", files={"file": filename})
             return self.get(uploaded["id"])
+        if upload_method == "url":
+            print("Downloading from URL...")
+            return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
         
         return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
     
