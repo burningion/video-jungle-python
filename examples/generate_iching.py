@@ -5,6 +5,7 @@ import random
 
 # Code for I Ching reading
 # https://en.wikipedia.org/wiki/I_Ching
+
 lines = {
     ("heads", "heads", "heads"): "yang (moving line)",
     ("heads", "heads", "tails"): "yin (broken line)",
@@ -58,7 +59,7 @@ VJ_API_KEY = os.environ['VJ_API_KEY']
 # Initialize API client
 vj = ApiClient(token=VJ_API_KEY)
 
-prompt = vj.prompts.generate(task="You are an AI that performs I Ching readings.",
+prompt = vj.prompts.generate(task="You are an AI that performs I Ching readings, relating the hexagram number and changing lines to the user's question",
                             parameters=["question", "number", "changinglines"])
 
 # See our generated prompt
@@ -69,7 +70,7 @@ print(prompt.value)
 #print(scripts)
 
 # Create a project to hold generated files, using our prompt we've generated
-project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt.id)
+project = vj.projects.create(name="First I Ching Project", description="First I Ching Project", prompt_id=prompt.id)
 
 # Get first script for the generation process
 # (Scripts define the video generation method from a prompt)
@@ -78,12 +79,13 @@ script_id = script.id
 
 # Print out parameters required for generation
 print(project.prompts[0]['parameters'])
+print(f"I Ching reading: {answer[0]} with changing lines: {answer[1]}")
 
 # Generate a video from our created prompt with dynamic variables
 video = vj.projects.generate(script_id=script_id, 
                              project_id=project.id,
-                             parameters={"question": "What is the meaning of life?",
-                                         "number": answer[0],
+                             parameters={"question": "What should I work on next?",
+                                         "number": str(answer[0]),
                                          "changinglines": str(answer[1])})
 
 print(video)
@@ -93,5 +95,5 @@ asset_id = video["asset_id"]
 
 # Save the video file to disk, automatically waits for generation
 print(f"Generating video with asset id: {asset_id}")
-video_file = vj.assets.download(asset_id, "generated_horoscope.mp4")
+video_file = vj.assets.download(asset_id, "generated_iching.mp4")
 print(f"Video generated and saved to: {video_file}")
