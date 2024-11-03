@@ -81,7 +81,7 @@ class Asset(BaseModel):
     asset_path: Optional[str]
     asset_type: str
     created_at: str
-    status: str
+    status: Optional[str]
     uploaded: bool
 
 class Project(BaseModel):
