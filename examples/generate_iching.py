@@ -3,6 +3,8 @@ import os
 
 import random
 
+import questionary
+
 # Code for I Ching reading
 # https://en.wikipedia.org/wiki/I_Ching
 
@@ -48,34 +50,48 @@ full_hexagram = []
 for i in range(6):
     full_hexagram.append(throw_coins())
 
-answer = build_hexagram(full_hexagram)
-print(answer) # (hexagram number, changing lines)
-
-# Now, let's make a video from this
-
 # Assumes you've set your API key as an environment variable
 VJ_API_KEY = os.environ['VJ_API_KEY']
 
 # Initialize API client
 vj = ApiClient(token=VJ_API_KEY)
 
-prompt = vj.prompts.generate(task="You are an AI that performs I Ching readings, relating the hexagram number and changing lines to the user's question",
+choice = questionary.select("Would you like to create a new project, or use an existing one?", 
+                            choices=["New", "Existing"]).ask()
+
+
+
+if choice == "New":
+    prompt = vj.prompts.generate(task="You are an AI that performs I Ching readings, relating the hexagram number and changing lines to the user's question",
                             parameters=["question", "number", "changinglines"])
 
-# See our generated prompt
-print(prompt.value)
+    # See our generated prompt
+    print(prompt.value)
 
-# Optionally, list out scripts available as generation methods
-#scripts = vj.scripts.list_options()
-#print(scripts)
+    # Optionally, list out scripts available as generation methods
+    #scripts = vj.scripts.list_options()
+    #print(scripts)
 
-# Create a project to hold generated files, using our prompt we've generated
-project = vj.projects.create(name="First I Ching Project", description="First I Ching Project", prompt_id=prompt.id)
+    # Create a project to hold generated files, using our prompt we've generated
+    project = vj.projects.create(name="First I Ching Project", description="First I Ching Project", prompt_id=prompt.id)
 
-# Get first script for the generation process
-# (Scripts define the video generation method from a prompt)
-script = project.scripts[0]
-script_id = script.id
+    # Get first script for the generation process
+    # (Scripts define the video generation method from a prompt)
+    script = project.scripts[0]
+    script_id = script.id
+else:
+    # Select an existing project
+    projects = vj.projects.list()
+    project_names = [project.name for project in projects]
+    project_name = questionary.select("Select a project", choices=project_names).ask()
+    project = next(project for project in projects if project.name == project_name)
+    script_id = project.scripts[0].id
+
+question = questionary.text("What is your question?").ask()
+
+answer = build_hexagram(full_hexagram)
+print(answer) # (hexagram number, changing lines)
+
 
 # Print out parameters required for generation
 print(project.prompts[0]['parameters'])
@@ -84,7 +100,7 @@ print(f"I Ching reading: {answer[0]} with changing lines: {answer[1]}")
 # Generate a video from our created prompt with dynamic variables
 video = vj.projects.generate(script_id=script_id, 
                              project_id=project.id,
-                             parameters={"question": "What should I work on next?",
+                             parameters={"question": question,
                                          "number": str(answer[0]),
                                          "changinglines": str(answer[1])})
 
