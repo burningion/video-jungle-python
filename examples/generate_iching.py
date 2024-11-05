@@ -59,9 +59,15 @@ vj = ApiClient(token=VJ_API_KEY)
 choice = questionary.select("Would you like to create a new project, or use an existing one?", 
                             choices=["New", "Existing"]).ask()
 
-
+if choice is None: # CTRL+C
+    exit()
 
 if choice == "New":
+    name = questionary.text("Enter a project name: ").ask()
+    description = questionary.text("Enter a project description: ").ask()
+    
+    if description is None:
+        description = ""
     prompt = vj.prompts.generate(task="You are an AI that performs I Ching readings, relating the hexagram number and changing lines to the user's question",
                             parameters=["question", "number", "changinglines"])
 
@@ -73,7 +79,8 @@ if choice == "New":
     #print(scripts)
 
     # Create a project to hold generated files, using our prompt we've generated
-    project = vj.projects.create(name="First I Ching Project", description="First I Ching Project", prompt_id=prompt.id)
+
+    project = vj.projects.create(name=name, description=description, prompt_id=prompt.id)
 
     # Get first script for the generation process
     # (Scripts define the video generation method from a prompt)
@@ -111,5 +118,9 @@ asset_id = video["asset_id"]
 
 # Save the video file to disk, automatically waits for generation
 print(f"Generating video with asset id: {asset_id}")
-video_file = vj.assets.download(asset_id, "generated_iching.mp4")
+
+filename = questionary.text("Enter a filename to save video (Ex: iching.mp4): ").ask()
+if not filename:
+    filename = "iching.mp4"
+video_file = vj.assets.download(asset_id, filename)
 print(f"Video generated and saved to: {video_file}")
