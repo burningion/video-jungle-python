@@ -1,8 +1,9 @@
 import requests
 from urllib import parse
 from typing import List
-from .model import VideoFile, Script, Prompt, Project, Asset, User
+from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch
 import time
+from uuid import UUID
 
 class ApiClient:
     BASE_URL = "https://api.video-jungle.com"
@@ -119,6 +120,15 @@ class VideoFileAPI:
     
     def delete(self, video_file_id: str):
         return self.client._make_request("DELETE", f"/video-file/{video_file_id}")
+    
+    def search(self, query: str, limit: int = 10, project_id: str = ""):
+        if project_id != "":
+            vs = VideoSearch(query=query, limit=limit, project_id=UUID(project_id))
+        else: 
+            vs = VideoSearch(query=query, limit=limit)
+        
+        obj = self.client._make_request("POST", "/video-file/search", json=vs.model_dump())
+        return obj
     
     def get_analysis(self, video_file_id: str):
         return self.client._make_request("GET", f"/video-file/{video_file_id}/analysis")

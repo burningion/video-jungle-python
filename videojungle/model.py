@@ -3,6 +3,13 @@ from typing import List, Optional
 from datetime import time
 from uuid import UUID
 
+class VideoSearch(BaseModel):
+    project_id: Optional[UUID] = None
+    query: Optional[str] = ""
+    limit: Optional[int] = 10
+    query_img: Optional[str] = None
+    query_audio: Optional[str] = None
+
 class VideoFile(BaseModel):
     id: str
     filename: str
