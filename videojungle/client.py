@@ -5,6 +5,7 @@ from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch
 import time
 from uuid import UUID
 
+
 class ApiClient:
     BASE_URL = "https://api.video-jungle.com"
 
@@ -129,6 +130,21 @@ class VideoFileAPI:
         
         obj = self.client._make_request("POST", "/video-file/search", json=vs.model_dump())
         return obj
+    
+    def download(self, video_id: str, filename: str):
+        video = self.get(video_id)
+        url = video.download_url
+        if not url:
+            raise Exception("Video file does not have a download URL")
+        
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(filename, 'wb') as f:
+                for chunk in response.iter_content(8192):
+                    f.write(chunk)
+            return filename
+        else:
+            raise Exception(f"Failed to download video: {response.text}")
     
     def get_analysis(self, video_file_id: str):
         return self.client._make_request("GET", f"/video-file/{video_file_id}/analysis")

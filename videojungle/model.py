@@ -20,11 +20,12 @@ class VideoFile(BaseModel):
     fps: Optional[float]
     owner_id: str
     size: Optional[int]
-    hash: str
+    hash: Optional[str]
     created_at: str
     recorded_at: Optional[str]
     key: str
     analysis: List[dict]
+    download_url: Optional[str]
     # embeddings: List[dict]
 
 class VideoAudioLevel(BaseModel):
