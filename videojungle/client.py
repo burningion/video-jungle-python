@@ -4,7 +4,7 @@ from typing import List
 from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch
 import time
 from uuid import UUID
-
+import httpx
 
 class ApiClient:
     BASE_URL = "https://api.video-jungle.com"
@@ -135,17 +135,17 @@ class VideoFileAPI:
         video = self.get(video_id)
         url = video.download_url
         if not url:
-            raise Exception("Video file does not have a download URL")
-        
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            with open(filename, 'wb') as f:
-                for chunk in response.iter_content(8192):
-                    f.write(chunk)
-            return filename
-        else:
-            raise Exception(f"Failed to download video: {response.text}")
-    
+            raise Exception("Video file has no download URL")
+        with httpx.Client() as client:
+                # Stream the response
+                with client.stream('GET', url) as response:
+                    response.raise_for_status()
+                    # Open file in binary write mode
+                    with open(filename, 'wb') as f:
+                        for chunk in response.iter_bytes():
+                            f.write(chunk)    
+        return True
+
     def get_analysis(self, video_file_id: str):
         return self.client._make_request("GET", f"/video-file/{video_file_id}/analysis")
     
