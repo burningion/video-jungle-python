@@ -1,14 +1,28 @@
 from pydantic import BaseModel
-from typing import List, Optional
-from datetime import time
+from typing import List, Optional, Set
+from datetime import time, datetime
 from uuid import UUID
+
+class DurationFilter(BaseModel):
+    min: float
+    max: float
+
+class VideoFilters(BaseModel):
+    duration: Optional[DurationFilter]
+    created_after: Optional[datetime]
+    created_before: Optional[datetime]
+    tags: Optional[Set[str]]
+    min_relevance: Optional[float]
 
 class VideoSearch(BaseModel):
     project_id: Optional[UUID] = None
-    query: Optional[str] = ""
-    limit: Optional[int] = 10
-    query_img: Optional[str] = None
+    query: Optional[str] = None
+    filters: Optional[VideoFilters] = None
+    limit: int = 10
+    include_segments: Optional[bool] = True
+    include_related: Optional[bool] = False
     query_audio: Optional[str] = None
+    query_img: Optional[str] = None
 
 class VideoFile(BaseModel):
     id: str

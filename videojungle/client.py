@@ -1,8 +1,9 @@
 import requests
 from urllib import parse
-from typing import List
-from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch
+from typing import List, Optional, Set
+from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter
 import time
+from datetime import datetime
 from uuid import UUID
 import httpx
 
@@ -122,14 +123,72 @@ class VideoFileAPI:
     def delete(self, video_file_id: str):
         return self.client._make_request("DELETE", f"/video-file/{video_file_id}")
     
-    def search(self, query: str, limit: int = 10, project_id: str = ""):
-        if project_id != "":
-            vs = VideoSearch(query=query, limit=limit, project_id=UUID(project_id))
-        else: 
-            vs = VideoSearch(query=query, limit=limit)
+    def search(
+        self,
+        query: Optional[str] = None,
+        limit: int = 10,
+        project_id: Optional[str] = None,
+        duration_min: Optional[float] = None,
+        duration_max: Optional[float] = None,
+        created_after: Optional[datetime] = None,
+        created_before: Optional[datetime] = None,
+        tags: Optional[Set[str]] = None,
+        min_relevance: Optional[float] = None,
+        include_segments: bool = True,
+        include_related: bool = False,
+        query_audio: Optional[str] = None,
+        query_img: Optional[str] = None,
+    ):
+        """
+        Search for videos with advanced filtering options.
         
-        obj = self.client._make_request("POST", "/video-file/search", json=vs.model_dump())
-        return obj
+        Args:
+            query: Text search query
+            limit: Maximum number of results to return
+            project_id: Optional project ID to scope the search
+            duration_min: Minimum video duration in seconds
+            duration_max: Maximum video duration in seconds
+            created_after: Filter videos created after this datetime
+            created_before: Filter videos created before this datetime
+            tags: Set of tags to filter by
+            min_relevance: Minimum relevance score threshold
+            include_segments: Whether to include video segments in results
+            include_related: Whether to include related videos
+            query_audio: Optional audio search query
+            query_img: Optional image search query
+        """
+        # Build the filters object if any filters are specified
+        filters = None
+        if any([duration_min, duration_max, created_after, created_before, tags, min_relevance]):
+            duration_filter = None
+            if duration_min is not None or duration_max is not None:
+                duration_filter = DurationFilter(
+                    min=duration_min or 0,
+                    max=duration_max or float('inf')
+                )
+                
+            filters = VideoFilters(
+                duration=duration_filter,
+                created_after=created_after,
+                created_before=created_before,
+                tags=tags,
+                min_relevance=min_relevance
+            )
+
+        # Create the search object
+        vs = VideoSearch(
+            query=query,
+            limit=limit,
+            project_id=UUID(project_id) if project_id else None,
+            filters=filters,
+            include_segments=include_segments,
+            include_related=include_related,
+            query_audio=query_audio,
+            query_img=query_img
+        )
+
+        # Make the request
+        return self.client._make_request("POST", "/video-file/search", json=vs.model_dump())
     
     def download(self, video_id: str, filename: str):
         video = self.get(video_id)
