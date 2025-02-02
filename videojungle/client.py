@@ -188,7 +188,7 @@ class VideoFileAPI:
         )
 
         # Make the request
-        return self.client._make_request("POST", "/video-file/search", json=vs.model_dump())
+        return self.client._make_request("POST", "/video-file/search", json=vs.model_dump_json())
     
     def download(self, video_id: str, filename: str):
         video = self.get(video_id)

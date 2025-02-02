@@ -23,6 +23,16 @@ class VideoSearch(BaseModel):
     include_related: Optional[bool] = False
     query_audio: Optional[str] = None
     query_img: Optional[str] = None
+    
+    @classmethod
+    def create(cls, 
+               query: Optional[str] = None,
+               tags: Optional[List[str]] = None,
+               **kwargs):
+        filters = None
+        if tags:
+            filters = VideoFilters(tags=tags)
+        return cls(query=query, filters=filters, **kwargs)
 
 class VideoFile(BaseModel):
     id: str
