@@ -8,31 +8,100 @@ class DurationFilter(BaseModel):
     max: float
 
 class VideoFilters(BaseModel):
-    duration: Optional[DurationFilter]
-    created_after: Optional[datetime]
-    created_before: Optional[datetime]
-    tags: Optional[Set[str]]
-    min_relevance: Optional[float]
+    duration: Optional[DurationFilter] = None
+    created_after: Optional[datetime] = None 
+    created_before: Optional[datetime] = None
+    tags: Optional[List[str]] = None
+    min_relevance: Optional[float] = None
 
-class VideoSearch(BaseModel):
-    project_id: Optional[UUID] = None
-    query: Optional[str] = None
-    filters: Optional[VideoFilters] = None
-    limit: int = 10
-    include_segments: Optional[bool] = True
-    include_related: Optional[bool] = False
-    query_audio: Optional[str] = None
-    query_img: Optional[str] = None
-    
     @classmethod
     def create(cls, 
-               query: Optional[str] = None,
+               duration_min: Optional[float] = None,
+               duration_max: Optional[float] = None,
+               created_after: Optional[datetime] = None,
+               created_before: Optional[datetime] = None,
                tags: Optional[List[str]] = None,
-               **kwargs):
-        filters = None
-        if tags:
-            filters = VideoFilters(tags=tags)
-        return cls(query=query, filters=filters, **kwargs)
+               min_relevance: Optional[float] = None) -> Optional['VideoFilters']:
+        # Only create filters if we have actual filter values
+        has_filters = any([
+            duration_min is not None,
+            duration_max is not None,
+            created_after is not None,
+            created_before is not None,
+            tags is not None,
+            min_relevance is not None
+        ])
+        
+        if not has_filters:
+            return None
+
+        duration = None
+        if duration_min is not None or duration_max is not None:
+            duration = DurationFilter(
+                min=duration_min if duration_min is not None else 0,
+                max=duration_max if duration_max is not None else float('inf')
+            )
+
+        return cls(
+            duration=duration,
+            created_after=created_after,
+            created_before=created_before,
+            tags=tags,
+            min_relevance=min_relevance
+        )
+
+class VideoSearch(BaseModel):
+    query: Optional[str] = None
+    limit: int = 10
+    project_id: Optional[UUID] = None
+    filters: Optional[VideoFilters] = None
+    include_segments: bool = True
+    include_related: bool = False
+    query_audio: Optional[str] = None
+    query_img: Optional[str] = None
+
+    @classmethod
+    def create(cls,
+               query: Optional[str] = None,
+               limit: int = 10,
+               project_id: Optional[str] = None,
+               duration_min: Optional[float] = None,
+               duration_max: Optional[float] = None,
+               created_after: Optional[datetime] = None,
+               created_before: Optional[datetime] = None,
+               tags: Optional[List[str]] = None,
+               min_relevance: Optional[float] = None,
+               include_segments: bool = True,
+               include_related: bool = False,
+               query_audio: Optional[str] = None,
+               query_img: Optional[str] = None) -> 'VideoSearch':
+        
+        if duration_min and duration_max and duration_min > duration_max:
+            dur = DurationFilter(min=duration_max, max=duration_min)
+        else:
+            dur = None
+        # Create filters if any filter parameters are provided
+        filters = VideoFilters(
+            duration=dur,
+            created_after=created_after,
+            created_before=created_before,
+            tags=tags,
+            min_relevance=min_relevance
+        )
+
+        # Convert string project_id to UUID if provided
+        uuid_project_id = UUID(project_id) if project_id else None
+
+        return cls(
+            query=query,
+            limit=limit,
+            project_id=uuid_project_id,
+            filters=filters,
+            include_segments=include_segments,
+            include_related=include_related,
+            query_audio=query_audio,
+            query_img=query_img
+        )
 
 class VideoFile(BaseModel):
     id: str

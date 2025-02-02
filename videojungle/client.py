@@ -132,7 +132,7 @@ class VideoFileAPI:
         duration_max: Optional[float] = None,
         created_after: Optional[datetime] = None,
         created_before: Optional[datetime] = None,
-        tags: Optional[Set[str]] = None,
+        tags: Optional[List[str]] = None,
         min_relevance: Optional[float] = None,
         include_segments: bool = True,
         include_related: bool = False,
@@ -157,38 +157,26 @@ class VideoFileAPI:
             query_audio: Optional audio search query
             query_img: Optional image search query
         """
-        # Build the filters object if any filters are specified
-        filters = None
-        if any([duration_min, duration_max, created_after, created_before, tags, min_relevance]):
-            duration_filter = None
-            if duration_min is not None or duration_max is not None:
-                duration_filter = DurationFilter(
-                    min=duration_min or 0,
-                    max=duration_max or float('inf')
-                )
-                
-            filters = VideoFilters(
-                duration=duration_filter,
-                created_after=created_after,
-                created_before=created_before,
-                tags=tags,
-                min_relevance=min_relevance
-            )
-
+        # Build the filters object if any filters are specified                
         # Create the search object
-        vs = VideoSearch(
+    
+        vs = VideoSearch.create(
             query=query,
             limit=limit,
-            project_id=UUID(project_id) if project_id else None,
-            filters=filters,
+            project_id=project_id,
+            tags=tags,
+            duration_min=duration_min,
+            duration_max=duration_max,
+            created_after=created_after,
+            created_before=created_before,
+            min_relevance=min_relevance,
             include_segments=include_segments,
             include_related=include_related,
             query_audio=query_audio,
             query_img=query_img
         )
-
         # Make the request
-        return self.client._make_request("POST", "/video-file/search", json=vs.model_dump_json())
+        return self.client._make_request("POST", "/video-file/search", json=vs.model_dump())
     
     def download(self, video_id: str, filename: str):
         video = self.get(video_id)
