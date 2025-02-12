@@ -91,13 +91,14 @@ class AssetsAPI:
     def delete(self, asset_id: str):
         return self.client._make_request("DELETE", f"/assets/{asset_id}")
     
-    def download(self, asset_id: str, filename: str):
+    def download(self, asset_id: str, filename: str, print_progress: bool = False):
         while True:
             asset = self.client._make_request("GET", f"/assets/{asset_id}")
             if asset["uploaded"]:
                 break
             time.sleep(.5)
-            print("Waiting for asset to be ready...")
+            if print_progress:
+                print("Waiting for asset to be ready...")
         url = asset["download_url"]
         response = requests.get(url, stream=True)
         if response.status_code == 200:
