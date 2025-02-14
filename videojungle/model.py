@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import List, Optional, Set
 from datetime import time, datetime
 from uuid import UUID
@@ -122,32 +122,116 @@ class VideoFile(BaseModel):
     # embeddings: List[dict]
 
 class VideoAudioLevel(BaseModel):
-    audio_level: float
-    start_time: Optional[time]
-    end_time: Optional[time]
+    """Model representing audio level measurements for a video segment."""
+    audio_level: float = Field(
+        ...,
+        title="Audio Level",
+        description="The measured audio level value in decimal format (0..1).",
+    )
+    start_time: Optional[time] = Field(
+        None,
+        title="Start Time",
+        description="The starting timestamp of this audio level measurement in 00:00:00.000 format.",
+    )
+    end_time: Optional[time] = Field(
+        None,
+        title="End Time",
+        description="The ending timestamp of this audio level measurement in 00:00:00.000 format.",
+    )
 
 class VideoEditAudioAsset(BaseModel):
-    audio_id: UUID
-    type: str
-    audio_start_time: Optional[time]
-    audio_end_time: Optional[time]
-    audio_levels: List[VideoAudioLevel]
+    """Model representing an audio asset that can be overlaid on a video edit."""
+    audio_id: UUID = Field(
+        ...,
+        title="Audio Asset ID",
+        description="Unique identifier for the audio asset.",
+    )
+    type: str = Field(
+        ...,
+        title="Asset Type",
+        description="The type of audio asset (e.g., 'music', 'voiceover', 'sound_effect').",
+    )
+    audio_start_time: Optional[time] = Field(
+        None,
+        title="Audio Start Time",
+        description="The timestamp where this audio asset should start playing.",
+    )
+    audio_end_time: Optional[time] = Field(
+        None,
+        title="Audio End Time",
+        description="The timestamp where this audio asset should stop playing.",
+    )
+    audio_levels: List[VideoAudioLevel] = Field(
+        ...,
+        title="Audio Levels",
+        description="List of audio level measurements for this asset.",
+    )
 
 class VideoEditAsset(BaseModel):
-    video_id: UUID
-    type: str
-    video_start_time: time
-    video_end_time: Optional[time]
-    audio_levels: List[VideoAudioLevel]
+    """Model representing a video asset in an edit sequence."""
+    video_id: UUID = Field(
+        ...,
+        title="Video UUID",
+        description="Unique identifier for the video asset.",
+    )
+    type: str = Field(
+        ...,
+        title="Asset Type",
+        description="The type of video asset (e.g., 'videofile', 'asset', etc.).",
+    )
+    video_start_time: time = Field(
+        ...,
+        title="Video Start Time",
+        description="The timestamp where this video segment should start in 00:00:00.000 format.",
+    )
+    video_end_time: Optional[time] = Field(
+        None,
+        title="Video End Time",
+        description="The timestamp where this video segment should end in 00:00:00.000 format.",
+    )
+    audio_levels: List[VideoAudioLevel] = Field(
+        ...,
+        title="Audio Levels",
+        description="List of audio level measurements for this video segment (0..1).",
+    )
 
 class VideoEditCreate(BaseModel):
-    video_edit_version: str
-    video_output_format: str
-    video_output_resolution: str
-    video_output_fps: float
-    video_output_filename: str
-    video_series_sequential: List[VideoEditAsset]
-    audio_overlay: List[VideoEditAudioAsset]
+    """Model representing the creation parameters for a video edit."""
+    video_edit_version: str = Field(
+        ...,
+        title="Edit Version",
+        description="Version identifier for this edit configuration.",
+    )
+    video_output_format: str = Field(
+        ...,
+        title="Output Format",
+        description="The desired output video format (e.g., 'mp4', 'mov').",
+    )
+    video_output_resolution: str = Field(
+        ...,
+        title="Output Resolution",
+        description="The desired output resolution (e.g., '1920x1080', '1080x1920').",
+    )
+    video_output_fps: float = Field(
+        ...,
+        title="Output FPS",
+        description="The desired output frames per second.",
+    )
+    video_output_filename: str = Field(
+        ...,
+        title="Output Filename",
+        description="The desired filename for the output video.",
+    )
+    video_series_sequential: List[VideoEditAsset] = Field(
+        ...,
+        title="Video Sequence",
+        description="Ordered list of video assets that make up the edit.",
+    )
+    audio_overlay: List[VideoEditAudioAsset] = Field(
+        ...,
+        title="Audio Overlays",
+        description="List of audio assets to overlay on the video sequence.",
+    )
 
 class User(BaseModel):
     id: str
