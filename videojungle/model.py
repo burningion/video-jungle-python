@@ -4,15 +4,45 @@ from datetime import time, datetime
 from uuid import UUID
 
 class DurationFilter(BaseModel):
-    min: float
-    max: float
+    """Model representing duration filter constraints for video search."""
+    min: float = Field(
+        ...,
+        title="Minimum Duration",
+        description="The minimum duration in seconds for filtering videos.",
+    )
+    max: float = Field(
+        ...,
+        title="Maximum Duration",
+        description="The maximum duration in seconds for filtering videos.",
+    )
 
 class VideoFilters(BaseModel):
-    duration: Optional[DurationFilter] = None
-    created_after: Optional[datetime] = None 
-    created_before: Optional[datetime] = None
-    tags: Optional[List[str]] = None
-    min_relevance: Optional[float] = None
+    """Model representing various filtering options for video search."""
+    duration: Optional[DurationFilter] = Field(
+        None,
+        title="Duration Filter",
+        description="Filter for video duration constraints.",
+    )
+    created_after: Optional[datetime] = Field(
+        None,
+        title="Created After",
+        description="Filter for videos created after this datetime.",
+    )
+    created_before: Optional[datetime] = Field(
+        None,
+        title="Created Before",
+        description="Filter for videos created before this datetime.",
+    )
+    tags: Optional[List[str]] = Field(
+        None,
+        title="Tags",
+        description="Filter videos by specific tags.",
+    )
+    min_relevance: Optional[float] = Field(
+        None,
+        title="Minimum Relevance",
+        description="Minimum relevance score for filtered results.",
+    )
 
     @classmethod
     def create(cls, 
@@ -51,14 +81,48 @@ class VideoFilters(BaseModel):
         )
 
 class VideoSearch(BaseModel):
-    query: Optional[str] = None
-    limit: int = 10
-    project_id: Optional[UUID] = None
-    filters: Optional[VideoFilters] = None
-    include_segments: bool = True
-    include_related: bool = False
-    query_audio: Optional[str] = None
-    query_img: Optional[str] = None
+    """Model representing video search parameters and filters."""
+    query: Optional[str] = Field(
+        None,
+        title="Search Query",
+        description="Text search query for finding videos.",
+    )
+    limit: int = Field(
+        10,
+        title="Result Limit",
+        description="Maximum number of results to return.",
+        ge=1,
+    )
+    project_id: Optional[UUID] = Field(
+        None,
+        title="Project ID",
+        description="UUID of the project to scope the search.",
+    )
+    filters: Optional[VideoFilters] = Field(
+        None,
+        title="Search Filters",
+        description="Additional filtering criteria for the search.",
+    )
+    include_segments: bool = Field(
+        True,
+        title="Include Segments",
+        description="Whether to include video segments in results.",
+    )
+    include_related: bool = Field(
+        False,
+        title="Include Related",
+        description="Whether to include related videos in results.",
+    )
+    query_audio: Optional[str] = Field(
+        None,
+        title="Audio Query",
+        description="Search query for audio content.",
+    )
+    query_img: Optional[str] = Field(
+        None,
+        title="Image Query",
+        description="Search query for image content.",
+    )
 
     @classmethod
     def create(cls,
