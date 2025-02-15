@@ -185,6 +185,24 @@ class VideoFile(BaseModel):
     download_url: Optional[str]
     # embeddings: List[dict]
 
+class VideoUpload(BaseModel):
+    """Model representing a video file upload."""
+    name: str = Field(
+        ...,
+        title="Video Name",
+        description="Name of the video file.",
+    )
+    filename: str = Field(
+        ...,
+        title="Filename",
+        description="Filename of the video file, or a URL to download the video.",
+    )
+    upload_method: Optional[str] = Field(
+        "file-no-chunk", # defaults to uploading a local file
+        title="Upload Method",
+        description="Method to use for uploading the video file. (e.g., 'file-no-chunk', 'direct', 'url').",
+    )
+
 class VideoAudioLevel(BaseModel):
     """Model representing audio level measurements for a video segment."""
     audio_level: float = Field(

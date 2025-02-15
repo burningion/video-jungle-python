@@ -210,7 +210,7 @@ class VideoFileAPI:
             upload_link = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
             uploaded = self.client._make_request("POST", f"/video-file/{upload_link['id']}/upload-video", files={"file": filename})
             return self.get(uploaded["id"])
-        if upload_method == "url":
+        elif upload_method == "url":
             print("Downloading from URL...")
             return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
         
