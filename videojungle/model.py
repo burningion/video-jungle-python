@@ -279,6 +279,16 @@ class VideoEditAsset(BaseModel):
 
 class VideoEditCreate(BaseModel):
     """Model representing the creation parameters for a video edit."""
+    name: Optional[str] = Field(
+        None,
+        title="Name of edit",
+        descripton="Name of editing project"
+    )
+    description: Optional[str] = Field(
+        None,
+        title="Description of edit",
+        description="Natural language description of the edit."
+    )
     video_edit_version: str = Field(
         ...,
         title="Edit Version",

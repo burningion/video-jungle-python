@@ -63,9 +63,16 @@ class ProjectsAPI:
         '''
         Render a video using the specified project and script
         Parameters is a dictionary of the parameters required by the prompt
+        Returns: {"asset_id": "ffff-ffff-ffff-ffff", "asset_key": "asset-key"}
         '''
         return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit)
     
+    def create_edit(self, project_id: str, create_edit: dict)
+        '''
+        Create a new edit within a project for editing before rendering
+        '''
+        return return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit)
+
 class AssetsAPI:
     def __init__(self, client):
         self.client = client

@@ -3,6 +3,8 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
+name = "videojungle"
+version = "0.1.41"
 dependencies = [
     "requests",
     "pydantic",
@@ -15,8 +17,6 @@ classifiers=[
     "Operating System :: OS Independent",
 ]
 requires-python = ">= 3.8"
-name = "videojungle"
-version = "0.1.40"
 readme = "README.md"
 
 [project.urls]
