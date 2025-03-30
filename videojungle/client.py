@@ -80,6 +80,19 @@ class ProjectsAPI:
         Returns same as above
         '''
         return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit)
+    
+    def get_edit(self, project_id: str, edit_id: str):
+        '''
+        Returns an edit from an edit id and a project id
+        '''
+        return self.client._make_request("GET", f"/projects/{project_id}/edits/{edit_id}")
+    
+    def list_edits(self, project_id: str):
+        '''
+        Returns a list of edits within a project
+        '''
+        return self.client._make_request("GET", f"/projects/{project_id}/edits")
+
 
 class AssetsAPI:
     def __init__(self, client):
