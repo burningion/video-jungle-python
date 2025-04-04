@@ -116,6 +116,12 @@ class AssetsAPI:
         obj = self.client._make_request("GET", f"/projects/{project_id}/asset/generated")
         return [Asset(**asset) for asset in obj]
     
+    def upload_asset(self, name: str, description: str, project_id: str, filename: str, upload_method: str = "file-no-chunk"):
+        upload_link = self.client._make_request("POST", f"/projects/{project_id}/asset", json={"filename": filename, "upload_method": upload_method, 
+                                                                                               "name": name, "description": description})
+        uploaded = self.client._make_request("POST", upload_link["url"], files={"file": filename})
+        return self.get(uploaded["id"])
+    
     def delete(self, asset_id: str):
         return self.client._make_request("DELETE", f"/assets/{asset_id}")
     
