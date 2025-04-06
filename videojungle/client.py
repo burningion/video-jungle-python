@@ -2,6 +2,7 @@ import requests
 from urllib import parse
 from typing import List, Optional, Set
 from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter
+from .utils import detect_file_type
 import time
 from datetime import datetime
 from uuid import UUID
@@ -25,8 +26,21 @@ class ApiClient:
         }
         url = f"{self.BASE_URL}/{endpoint.lstrip('/')}"
         response = requests.request(method, url, headers=headers, **kwargs)
-        response.raise_for_status()
-        return response.json()
+        
+        try:
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 422:
+                try:
+                    error_detail = response.json()
+                    print(f"422 Unprocessable Entity: {error_detail}")
+                    # This will show the validation errors FastAPI returns
+                except ValueError:
+                    print("422 Unprocessable Entity: Could not parse error response")
+            
+            # Re-raise the original exception after printing details
+            raise e
     
 class ProjectsAPI:
     def __init__(self, client):
@@ -117,11 +131,19 @@ class AssetsAPI:
         return [Asset(**asset) for asset in obj]
     
     def upload_asset(self, name: str, description: str, project_id: str, filename: str, upload_method: str = "file-no-chunk"):
-        upload_link = self.client._make_request("POST", f"/projects/{project_id}/asset", json={"filename": filename, "upload_method": upload_method, 
-                                                                                               "name": name, "description": description})
-        uploaded = self.client._make_request("POST", upload_link["url"], files={"file": filename})
+        # filetype = detect_file_type(filename)
+        upload_link = self.client._make_request("POST", f"/projects/{project_id}/asset", json={"upload_method": upload_method, 
+                                                                                               "asset_type": "user",
+                                                                                               "keyname": name,
+                                                                                               "description": description})
+        #print(upload_link)
+        uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], files={"file": filename})
         return self.get(uploaded["id"])
     
+    def add_asset_from_video_file(self, video_file_id: str, project_id: str, start_time: Optional[float] = None, end_time: Optional[float] = None):
+        # TODO: Implement this method
+        pass
+
     def delete(self, asset_id: str):
         return self.client._make_request("DELETE", f"/assets/{asset_id}")
     
