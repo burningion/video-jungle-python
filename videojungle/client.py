@@ -133,11 +133,13 @@ class AssetsAPI:
     def upload_asset(self, name: str, description: str, project_id: str, filename: str, upload_method: str = "file-no-chunk"):
         # filetype = detect_file_type(filename)
         upload_link = self.client._make_request("POST", f"/projects/{project_id}/asset", json={"upload_method": upload_method, 
-                                                                                               "asset_type": "user",
-                                                                                               "keyname": name,
-                                                                                               "description": description})
-        #print(upload_link)
-        uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], files={"file": filename})
+                                                                                            "asset_type": "user",
+                                                                                            "keyname": name,
+                                                                                            "description": description})
+        # Open the file in binary mode and pass the file object
+        with open(filename, 'rb') as file_object:
+            uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], 
+                                                files={"file": (filename, file_object)})
         return self.get(uploaded["id"])
     
     def add_asset_from_video_file(self, video_file_id: str, project_id: str, start_time: Optional[float] = None, end_time: Optional[float] = None):
