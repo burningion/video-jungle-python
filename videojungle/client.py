@@ -136,7 +136,7 @@ class AssetsAPI:
                                                                                             "asset_type": "user",
                                                                                             "keyname": name,
                                                                                             "description": description})
-        if upload_method == "youtube":
+        if upload_method == "youtube-url":
             return upload_link
         # Open the file in binary mode and pass the file object
         with open(filename, 'rb') as file_object:
