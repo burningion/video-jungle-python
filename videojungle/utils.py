@@ -1,3 +1,4 @@
+import re
 import mimetypes
 
 # Make sure MIME types are initialized
@@ -26,3 +27,13 @@ def detect_file_type(file_path):
         return "video", mime_type
     else:
         return "other", mime_type
+
+def is_youtube_url(string):
+    # Pattern to match common YouTube URL formats
+    youtube_pattern = r'(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?v=|embed\/|v\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})'
+    
+    # Search for the pattern in the string
+    match = re.search(youtube_pattern, string)
+    
+    # Return True if found, False otherwise
+    return match is not None

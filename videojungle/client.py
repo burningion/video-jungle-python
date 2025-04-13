@@ -2,7 +2,7 @@ import requests
 from urllib import parse
 from typing import List, Optional, Set
 from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter
-from .utils import detect_file_type
+from .utils import is_youtube_url
 import time
 from datetime import datetime
 from uuid import UUID
@@ -132,12 +132,16 @@ class AssetsAPI:
     
     def upload_asset(self, name: str, description: str, project_id: str, filename: str, upload_method: str = "file-no-chunk"):
         # filetype = detect_file_type(filename)
+        if is_youtube_url(filename):
+            asset_type = "youtube-url"
+        else:
+            asset_type = "user"
+        
         upload_link = self.client._make_request("POST", f"/projects/{project_id}/asset", json={"upload_method": upload_method, 
-                                                                                            "asset_type": "user",
-                                                                                            "keyname": name,
-                                                                                            "description": description})
-        if upload_method == "youtube-url":
-            return upload_link
+                                                                                               "asset_type": asset_type,
+                                                                                               "keyname": name,
+                                                                                               "description": description})
+        
         # Open the file in binary mode and pass the file object
         with open(filename, 'rb') as file_object:
             uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], 
