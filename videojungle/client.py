@@ -125,13 +125,25 @@ class AssetsAPI:
     def list_for_project(self, project_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/asset")
         return [Asset(**asset) for asset in obj]
-
+    
     def list_generated_for_project(self, project_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/asset/generated")
         return [Asset(**asset) for asset in obj]
     
+    def add_videofile_to_project(self, project_id: str, video_file_id: str, description: str = ""):
+        obj = self.upload_asset(name=video_file_id, description=description, project_id=project_id, filename="", upload_method="video-reference")
+        return obj
+    
     def upload_asset(self, name: str, description: str, project_id: str, filename: str, upload_method: str = "file-no-chunk"):
         # filetype = detect_file_type(filename)
+        if upload_method == "video-reference":
+            # name should be uuid of asset
+            asset_type = "video-reference"
+            link = self.client._make_request("POST", f"/projects/{project_id}/asset", json={"upload_method": upload_method, 
+                                                                                               "asset_type": asset_type,
+                                                                                               "keyname": name,
+                                                                                               "description": description})
+            return self.get(link['id'])
         if is_youtube_url(filename):
             asset_type = "youtube-url"
         else:
@@ -141,7 +153,7 @@ class AssetsAPI:
                                                                                                "asset_type": asset_type,
                                                                                                "keyname": name,
                                                                                                "description": description})
-        
+
         # Open the file in binary mode and pass the file object
         with open(filename, 'rb') as file_object:
             uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], 
