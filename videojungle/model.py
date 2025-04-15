@@ -182,7 +182,7 @@ class VideoFile(BaseModel):
     recorded_at: Optional[str]
     key: str
     analysis: List[dict]
-    download_url: Optional[str]
+    download_url: Optional[str] = None
     # embeddings: List[dict]
 
 class VideoUpload(BaseModel):
