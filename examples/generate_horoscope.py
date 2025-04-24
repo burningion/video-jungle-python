@@ -39,7 +39,7 @@ video = vj.projects.generate(script_id=script_id,
                              project_id=project.id,
                              parameters={"zodiac sign": "Aries",
                                          "lucky number": "7",
-                                         "date": "September 3, 2024"})
+                                         "date": ""2025-04-24""})
 print(video)
 
 # Get the video file ID from the generated video
