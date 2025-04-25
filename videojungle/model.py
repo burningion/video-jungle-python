@@ -282,7 +282,7 @@ class VideoEditCreate(BaseModel):
     name: Optional[str] = Field(
         None,
         title="Name of edit",
-        descripton="Name of editing project"
+        description="Name of editing project"
     )
     description: Optional[str] = Field(
         None,

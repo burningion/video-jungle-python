@@ -1,7 +1,7 @@
 import requests
 from urllib import parse
-from typing import List, Optional, Set
-from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter
+from typing import List, Optional, Any
+from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate
 from .utils import is_youtube_url
 import time
 from datetime import datetime
@@ -19,6 +19,7 @@ class ApiClient:
         self.scripts = ScriptsAPI(self)
         self.assets = AssetsAPI(self)
         self.user_account = UserAPI(self)
+        self.edits = EditAPI(self)
 
     def _make_request(self, method, endpoint, **kwargs):
         headers = {
@@ -81,6 +82,8 @@ class ProjectsAPI:
         '''
         return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit)
     
+
+    
     def update_edit(self, project_id: str, edit_id: str, edit: dict):
         '''
         Update an existing edit within a project
@@ -88,12 +91,12 @@ class ProjectsAPI:
         '''
         return self.client._make_request("PUT", f"/projects/{project_id}/edits/{edit_id}", json=edit)
     
-    def create_edit(self, project_id: str, create_edit: dict):
+    def create_edit(self, project_id: str, create_edit: VideoEditCreate):
         '''
         Create a new edit within a project for editing before rendering
         Returns same as above
         '''
-        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit)
+        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit.model_dump_json())
     
     def get_edit(self, project_id: str, edit_id: str):
         '''
@@ -130,7 +133,7 @@ class AssetsAPI:
         obj = self.client._make_request("GET", f"/projects/{project_id}/asset/generated")
         return [Asset(**asset) for asset in obj]
     
-    def add_videofile_to_project(self, project_id: str, video_file_id: str, description: str = ""):
+    def add_videoefile_to_project(self, project_id: str, video_file_id: str, description: str = ""):
         obj = self.upload_asset(name=video_file_id, description=description, project_id=project_id, filename="", upload_method="video-reference")
         return obj
     
@@ -362,3 +365,22 @@ class UserAPI:
     def info(self):
         obj = self.client._make_request("GET", "/users/me")
         return User(**obj)
+    
+class EditAPI:
+    def __init__(self, client):
+        self.client = client
+
+    def get_edit_schema(self) -> dict[str, Any]:
+        '''
+        Get the schema for the edit object
+        Returns a JSON schema   
+        '''
+        return VideoEditCreate.model_json_schema()
+        
+    def get(self, project_id: str, edit_id: str):
+        obj = self.client._make_request("GET", f"/projects/{project_id}/edits/{edit_id}")
+        return obj
+    
+    def list(self, project_id: str):
+        obj = self.client._make_request("GET", f"/projects/{project_id}/edits")
+        return obj
