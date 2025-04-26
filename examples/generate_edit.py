@@ -8,7 +8,9 @@ VJ_API_KEY = os.environ['VJ_API_KEY']
 vj = ApiClient(token=VJ_API_KEY)
 
 # Create a project or use an existing one
-project_id = "e517d9ae-f4e4-4319-86a9-76f46e48b8a2"
+project = vj.projects.create(name="My Project", description="This is a test project")
+project_id = project.id
+
 # Upload a video file from local computer
 video = vj.video_files.create(name="Kirk Upload", filename="/Users/stankley/Video/50spin.mp4")
 
@@ -16,6 +18,7 @@ video = vj.video_files.create(name="Kirk Upload", filename="/Users/stankley/Vide
 edit  = vj.edits.create_edit_from_clips(project_id=project_id, 
                                         name="program generated edit", 
                                         description="three clip edit",
+                                        skip_rendering=False, # set to True not render!
                                         clips=[{"start_time": "00:00:10.000", 
                                                 "end_time": "00:00:15.000", 
                                                 "type": "videofile", 
@@ -28,3 +31,7 @@ edit  = vj.edits.create_edit_from_clips(project_id=project_id,
 
 # Now we can open it in a browser
 vj.edits.open_in_browser(project_id, edit['id'])
+
+# Or download the edit
+# Note: This will download the rendered video, not the edit itself
+vj.assets.download(edit['id'], filename="edit.mp4")
