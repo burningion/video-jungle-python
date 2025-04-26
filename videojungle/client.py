@@ -278,7 +278,7 @@ class VideoFileAPI:
     def get_analysis(self, video_file_id: str):
         return self.client._make_request("GET", f"/video-file/{video_file_id}/analysis")
     
-    def create(self, name: str, filename: str, upload_method: str = "file-no-chunk"):
+    def create(self, name: str, filename: str, upload_method: str = "file-no-chunk", run_analysis: bool = True):
         '''
         Create a video file
         Expects an upload method of either: 'url', 'direct', or 'file-no-chunk'
@@ -290,13 +290,20 @@ class VideoFileAPI:
         if upload_method == "file-no-chunk":
             upload_link = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
             uploaded = self.client._make_request("POST", f"/video-file/{upload_link['video']['id']}/upload-video", files={"file": filename})
+            if run_analysis:
+                self.client._make_request("POST", f"/video-file/{uploaded['id']}/analysis")
             return self.get(uploaded["id"])
         elif upload_method == "url":
             print("Downloading from URL...")
             return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
         
-        return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
-    
+        if run_analysis:
+            vf = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
+            self.client._make_request("POST", f"/video-file/{vf['id']}/analysis")
+            return vf
+        else:
+            return self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
+
     def upload_direct(self, video_file_id, file):
         return self.client._make_request("POST", f"/video-file/{video_file_id}/upload-video", files={"file": file})
     
