@@ -289,7 +289,6 @@ class VideoFileAPI:
         '''
         if upload_method == "file-no-chunk":
             upload_link = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
-            print(f"upload link is: {upload_link}")
             uploaded = self.client._make_request("POST", f"/video-file/{upload_link['video']['id']}/upload-video", files={"file": filename})
             return self.get(uploaded["id"])
         elif upload_method == "url":
