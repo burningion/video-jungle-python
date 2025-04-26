@@ -314,6 +314,7 @@ class VideoEditCreate(BaseModel):
         title="Output Filename",
         description="The desired filename for the output video.",
     )
+    skip_rendering: Optional[bool] = False
     video_series_sequential: List[VideoEditAsset] = Field(
         ...,
         title="Video Sequence",

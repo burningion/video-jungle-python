@@ -1,7 +1,7 @@
 import requests
 from urllib import parse
 from typing import List, Optional, Any
-from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate
+from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset
 from .utils import is_youtube_url
 import time
 from datetime import datetime
@@ -25,6 +25,10 @@ class ApiClient:
         headers = {
             "X-API-Key": self.token
         }
+        if 'headers' in kwargs:
+            user_headers = kwargs.pop('headers')
+            headers.update(user_headers)
+
         url = f"{self.BASE_URL}/{endpoint.lstrip('/')}"
         response = requests.request(method, url, headers=headers, **kwargs)
         
@@ -81,8 +85,6 @@ class ProjectsAPI:
         Returns: {"asset_id": "ffff-ffff-ffff-ffff", "asset_key": "asset-key", "edit_id": "4444-4444-4444-4444"}
         '''
         return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit)
-    
-
     
     def update_edit(self, project_id: str, edit_id: str, edit: dict):
         '''
@@ -376,6 +378,95 @@ class EditAPI:
         Returns a JSON schema   
         '''
         return VideoEditCreate.model_json_schema()
+
+    def create_edit(self, project_id: str, create_edit: VideoEditCreate):
+        '''
+        Create a new edit within a project for editing before rendering
+        Returns same as above
+        '''
+        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", data=create_edit.model_dump_json(),
+                                         headers={"Content-Type": "application/json"})
+
+    def create_edit_from_clips(
+                    self, 
+                    project_id: str, 
+                    clips: list[dict],
+                    name: str = "",
+                    description: str = "",
+                    output_format: str = "mp4",
+                    output_resolution: str = "1920x1080",
+                    output_fps: float = 30.0,
+                    skip_rendering: bool = False
+                ) -> VideoEditCreate:
+        """
+        Create a video edit with multiple clips.
+        
+        Args:
+            project_id: Project ID
+            clips: List of clip dictionaries, each containing:
+                - video_id: Video UUID (string)
+                - type: Asset type (string, default: "videofile")
+                - start_time: Start time in 00:00:00.000 format (string)
+                - end_time: End time in 00:00:00.000 format (string)
+            name: Optional name for the edit
+            description: Optional description for the edit
+            output_format: Output format (default: mp4)
+            output_resolution: Output resolution (default: 1920x1080)
+            output_fps: Output frames per second (default: 30.0)
+            
+        Returns:
+            Response from the API
+        """
+        
+        # Create video series from clips
+        video_series = []
+        for clip in clips:
+            # Get clip details with defaults
+            video_id = clip.get("video_id")
+            clip_type = clip.get("type", "videofile")
+            start_time = clip.get("start_time")
+            end_time = clip.get("end_time")
+            
+            # Validate required fields
+            if not video_id:
+                raise ValueError("Each clip must include a video_id")
+            if not start_time:
+                raise ValueError("Each clip must include a start_time")
+            if not end_time:
+                raise ValueError("Each clip must include an end_time")
+                
+            # Convert string UUID to UUID object if needed
+            try:
+                video_uuid = UUID(video_id) if isinstance(video_id, str) else video_id
+            except ValueError:
+                raise ValueError(f"Invalid video_id: {video_id}")
+            
+            # Create video asset
+            video_asset = VideoEditAsset(
+                video_id=video_uuid,
+                type=clip_type,
+                video_start_time=start_time,
+                video_end_time=end_time,
+                audio_levels=[]  # Empty list as default
+            )
+            
+            video_series.append(video_asset)
+        
+        # Create the edit object
+        edit = VideoEditCreate(
+            name=name,
+            description=description,
+            video_edit_version="1.0",
+            video_output_format=output_format,
+            video_output_resolution=output_resolution,
+            video_output_fps=output_fps,
+            video_output_filename=f"{name or 'video'}.{output_format}",
+            video_series_sequential=video_series,
+            audio_overlay=[],  # Empty list as default
+            skip_rendering=skip_rendering  # If true don't render yet
+        )
+    
+        return self.create_edit(project_id, edit)
         
     def get(self, project_id: str, edit_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/edits/{edit_id}")
