@@ -289,7 +289,8 @@ class VideoFileAPI:
         '''
         if upload_method == "file-no-chunk":
             upload_link = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
-            uploaded = self.client._make_request("POST", f"/video-file/{upload_link['id']}/upload-video", files={"file": filename})
+            print(f"upload link is: {upload_link}")
+            uploaded = self.client._make_request("POST", f"/video-file/{upload_link['video']['id']}/upload-video", files={"file": filename})
             return self.get(uploaded["id"])
         elif upload_method == "url":
             print("Downloading from URL...")
@@ -397,7 +398,7 @@ class EditAPI:
                     output_resolution: str = "1920x1080",
                     output_fps: float = 30.0,
                     skip_rendering: bool = False
-                ) -> VideoEditCreate:
+                ) -> dict:
         """
         Create a video edit with multiple clips.
         
@@ -471,6 +472,15 @@ class EditAPI:
     def get(self, project_id: str, edit_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/edits/{edit_id}")
         return obj
+    
+    def open_in_browser(self, project_id: str, edit_id: str):
+        """
+        Open the edit in the browser.
+        """
+        url = f"https://app.video-jungle.com/projects/{project_id}/edits/{edit_id}"
+        import webbrowser
+        webbrowser.open(url)
+        return "Opening in browser..."
     
     def list(self, project_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/edits")
