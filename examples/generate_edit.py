@@ -18,7 +18,7 @@ video = vj.video_files.create(name="Kirk Upload", filename="/Users/stankley/Vide
 edit  = vj.edits.create_edit_from_clips(project_id=project_id, 
                                         name="program generated edit", 
                                         description="three clip edit",
-                                        skip_rendering=False, # set to True not render!
+                                        skip_rendering=True, # don't render yet! set this to False to render
                                         clips=[{"start_time": "00:00:10.000", 
                                                 "end_time": "00:00:15.000", 
                                                 "type": "videofile", 
@@ -30,8 +30,7 @@ edit  = vj.edits.create_edit_from_clips(project_id=project_id,
                                                 ])
 
 # Now we can open it in a browser
-vj.edits.open_in_browser(project_id, edit['id'])
+vj.edits.open_in_browser(project_id, edit['edit_id'])
 
-# Or download the edit
-# Note: This will download the rendered video, not the edit itself
-vj.assets.download(edit['id'], filename="edit.mp4")
+# Now render the edit
+vj.edits.download_edit_render(project_id, edit["edit_id"], "out.mp4", True)
