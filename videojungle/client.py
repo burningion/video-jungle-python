@@ -508,10 +508,10 @@ class EditAPI:
         edit = self.get(project_id=project_id, edit_id=edit_id)
         print(edit)
         download_url = edit.get("download_url")
-        
+
         if not download_url:
-            self.render_edit(project_id=project_id, edit_id=edit_id)
-            asset_id = edit["asset_id"]
+            render = self.render_edit(project_id=project_id, edit_id=edit_id)
+            asset_id = render["asset_id"]
 
             while True:
                 asset = self.client._make_request("GET", f"/assets/{asset_id}")
