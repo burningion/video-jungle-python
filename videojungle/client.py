@@ -289,7 +289,8 @@ class VideoFileAPI:
         '''
         if upload_method == "file-no-chunk":
             upload_link = self.client._make_request("POST", "/video-file", json={"name": name, "filename": filename, "upload_method": upload_method})
-            uploaded = self.client._make_request("POST", f"/video-file/{upload_link['video']['id']}/upload-video", files={"file": filename})
+            with open(filename, 'rb') as file_obj:
+                uploaded = self.client._make_request("POST", f"/video-file/{upload_link['video']['id']}/upload-video", files={"file": file_obj})
             if run_analysis:
                 self.client._make_request("POST", f"/video-file/{uploaded['id']}/analysis")
             return self.get(uploaded["id"])
@@ -486,8 +487,46 @@ class EditAPI:
         url = f"https://app.video-jungle.com/projects/{project_id}/edits/{edit_id}"
         import webbrowser
         webbrowser.open(url)
-        return "Opening in browser..."
+        return
     
     def list(self, project_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/edits")
         return obj
+    
+    def render_edit(self, project_id: str, edit_id: str) -> dict:
+        """
+        Returns a dictionary with asset_id, asset_key, and original edit_id
+        """
+        return self.client._make_request("POST", f"/projects/{project_id}/edits/{edit_id}/render")
+    
+    def download_edit_render(self, project_id: str, edit_id: str, filename: str, print_progress: bool = False):
+        """
+        Download an edit render, rendering and waiting for rendered file if
+        not already rendered. Optionally print progress to console.se
+        """
+
+        edit = self.get(project_id=project_id, edit_id=edit_id)
+        print(edit)
+        download_url = edit.get("download_url")
+        
+        if not download_url:
+            self.render_edit(project_id=project_id, edit_id=edit_id)
+            asset_id = edit["asset_id"]
+
+            while True:
+                asset = self.client._make_request("GET", f"/assets/{asset_id}")
+                if asset["uploaded"]:
+                    break
+                time.sleep(.5)
+                if print_progress:
+                    print("Waiting for asset to be ready...")
+            
+            url = asset["download_url"]
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(filename, 'wb') as f:
+                for chunk in response.iter_content(8192):
+                    f.write(chunk)
+            return filename
+        else:
+            raise Exception(f"Failed to download asset: {response.text}")
