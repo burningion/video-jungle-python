@@ -135,7 +135,7 @@ class AssetsAPI:
         obj = self.client._make_request("GET", f"/projects/{project_id}/asset/generated")
         return [Asset(**asset) for asset in obj]
     
-    def add_videoefile_to_project(self, project_id: str, video_file_id: str, description: str = ""):
+    def add_videofile_to_project(self, project_id: str, video_file_id: str, description: str = ""):
         obj = self.upload_asset(name=video_file_id, description=description, project_id=project_id, filename="", upload_method="video-reference")
         return obj
     
@@ -430,14 +430,14 @@ class EditAPI:
         video_series = []
         for clip in clips:
             # Get clip details with defaults
-            video_id = clip.get("video_id")
+            video_id = clip.get("id")
             clip_type = clip.get("type", "videofile")
             start_time = clip.get("start_time")
             end_time = clip.get("end_time")
             
             # Validate required fields
             if not video_id:
-                raise ValueError("Each clip must include a video_id")
+                raise ValueError("Each clip must include an id")
             if not start_time:
                 raise ValueError("Each clip must include a start_time")
             if not end_time:
@@ -447,7 +447,7 @@ class EditAPI:
             try:
                 video_uuid = UUID(video_id) if isinstance(video_id, str) else video_id
             except ValueError:
-                raise ValueError(f"Invalid video_id: {video_id}")
+                raise ValueError(f"Invalid id: {video_id}")
             
             # Create video asset
             video_asset = VideoEditAsset(

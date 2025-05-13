@@ -359,6 +359,9 @@ class Asset(BaseModel):
     asset_path: Optional[str]
     asset_type: str
     created_at: str
+    description: Optional[str]
+    generated_description: Optional[str]
+    create_parameters: Optional[dict]
     status: Optional[str]
     uploaded: bool
 
