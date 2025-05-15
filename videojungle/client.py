@@ -53,22 +53,35 @@ class ProjectsAPI:
 
     def get(self, project_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}")
-        return Project(**obj)
+        project = Project(**obj)
+        project._client = self.client
+        return project
     
     def list(self):
         obj = self.client._make_request("GET", "/projects")
-        return [Project(**project) for project in obj]
+        projects = [Project(**project) for project in obj]
+        for project in projects:
+            project._client = self.client
+        return projects
     
     def create(self, name: str, description: str, prompt_id=None, generation_method: str = "prompt-to-video"):
         if prompt_id:
-            project = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "prompt_id": prompt_id, "data": generation_method})
-            return self.get(project["id"])
+            project_data = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "prompt_id": prompt_id, "data": generation_method})
         else:
-            project = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "data": generation_method})
-            return self.get(project["id"])
+            project_data = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "data": generation_method})
+        
+        # Use get method which already sets the _client attribute
+        return self.get(project_data["id"])
     
     def delete(self, project_id: str):
         return self.client._make_request("DELETE", f"/projects/{project_id}")
+    
+    def update_project_data(self, project_id: str) -> Project:
+        '''
+        Updates the project data by fetching the latest information from the server
+        Returns the updated project
+        '''
+        return self.get(project_id)
     
     def generate(self, project_id: str, script_id: str, parameters: dict):
         '''
@@ -136,6 +149,7 @@ class AssetsAPI:
         return [Asset(**asset) for asset in obj]
     
     def add_videofile_to_project(self, project_id: str, video_file_id: str, description: str = ""):
+        # The upload_asset method already updates project data internally
         obj = self.upload_asset(name=video_file_id, description=description, project_id=project_id, filename="", upload_method="video-reference")
         return obj
     
@@ -148,6 +162,8 @@ class AssetsAPI:
                                                                                                "asset_type": asset_type,
                                                                                                "keyname": name,
                                                                                                "description": description})
+            # Update project data after upload
+            self.client.projects.update_project_data(project_id)
             return self.get(link['id'])
         if is_youtube_url(filename):
             asset_type = "youtube-url"
@@ -163,6 +179,9 @@ class AssetsAPI:
         with open(filename, 'rb') as file_object:
             uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], 
                                                 files={"file": (filename, file_object)})
+        
+        # Update project data after upload
+        self.client.projects.update_project_data(project_id)
         return self.get(uploaded["id"])
     
     def add_asset_from_video_file(self, video_file_id: str, project_id: str, start_time: Optional[float] = None, end_time: Optional[float] = None):

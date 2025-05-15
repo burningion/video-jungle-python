@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Optional, Set
+from typing import List, Optional, Set, Any
 from datetime import time, datetime
 from uuid import UUID
 
@@ -384,18 +384,122 @@ class Project(BaseModel):
     assets: List[Asset]
     prompts: List[dict]
     scripts: List[Script]
+    _client: Optional[Any] = None
 
-    @property
-    def has_analyzing_assets(self) -> bool:
+    def has_analyzing_assets(self, client: Optional[Any] = None) -> bool:
         """
-        Checks if the project has any assets that are still being analyzed.
-        Returns True if at least one asset is still being analyzed, False otherwise.
+        Checks if the project has any assets that are currently being analyzed by checking with the API.
+        
+        Args:
+            client: Optional ApiClient instance. If not provided, uses the previously set client.
+            
+        Returns:
+            bool: True if at least one asset is still being analyzed, False otherwise.
+            
+        Raises:
+            ValueError: If no client is available and none is provided
         """
-        return any(asset.is_analyzing for asset in self.assets)
+        # Use provided client or stored client
+        api_client = client or self._client
+        
+        if api_client is None:
+            raise ValueError("No API client available. Either set the _client attribute on the Project instance or provide a client parameter.")
+            
+        # Get the latest project data from the API
+        updated_project = api_client.projects.get(self.id)
+        
+        # Check if any assets are in analyzing state
+        return any(asset.is_analyzing for asset in updated_project.assets)
 
-    @property
-    def analyzing_assets(self) -> List[Asset]:
+    def analyzing_assets(self, client: Optional[Any] = None) -> List[Asset]:
         """
-        Returns a list of all assets that are still being analyzed.
+        Returns a list of all assets that are currently being analyzed by checking with the API.
+        
+        Args:
+            client: Optional ApiClient instance. If not provided, uses the previously set client.
+            
+        Returns:
+            List[Asset]: A list of all assets that are still being analyzed.
+            
+        Raises:
+            ValueError: If no client is available and none is provided
         """
-        return [asset for asset in self.assets if asset.is_analyzing]
+        # Use provided client or stored client
+        api_client = client or self._client
+        
+        if api_client is None:
+            raise ValueError("No API client available. Either set the _client attribute on the Project instance or provide a client parameter.")
+            
+        # Get the latest project data from the API
+        updated_project = api_client.projects.get(self.id)
+        
+        # Return list of analyzing assets
+        return [asset for asset in updated_project.assets if asset.is_analyzing]
+        
+    def upload_asset(self, name: str, description: str, filename: str, upload_method: str = "file-no-chunk", client: Optional[Any] = None) -> Asset:
+        """
+        Uploads an asset to the project.
+        
+        Args:
+            name: Name of the asset
+            description: Description of the asset
+            filename: Path to the file to upload
+            upload_method: Upload method to use (default: "file-no-chunk")
+            client: Optional ApiClient instance. If not provided, uses the previously set client.
+            
+        Returns:
+            Asset: The uploaded asset
+            
+        Raises:
+            ValueError: If no client is available and none is provided
+        """
+        # Use provided client or stored client
+        api_client = client or self._client
+        
+        if api_client is None:
+            raise ValueError("No API client available. Either set the _client attribute on the Project instance or provide a client parameter.")
+            
+        asset = api_client.assets.upload_asset(
+            name=name, 
+            description=description, 
+            project_id=self.id, 
+            filename=filename, 
+            upload_method=upload_method
+        )
+        
+        # Refresh the project's assets list to include the new asset
+        self.assets.append(asset)
+        self.asset_count += 1
+        
+        # Update project data after upload
+        self.update_project_data(api_client)
+        
+        return asset
+        
+    def update_project_data(self, client: Optional[Any] = None) -> None:
+        """
+        Updates the project data with the latest information from the server.
+        
+        Args:
+            client: Optional ApiClient instance. If not provided, uses the previously set client.
+            
+        Raises:
+            ValueError: If no client is available and none is provided
+        """
+        # Use provided client or stored client
+        api_client = client or self._client
+        
+        if api_client is None:
+            raise ValueError("No API client available. Either set the _client attribute on the Project instance or provide a client parameter.")
+            
+        # Get updated project data
+        updated_project = api_client.projects.get(self.id)
+        
+        # Update project properties
+        self.name = updated_project.name
+        self.description = updated_project.description
+        self.data = updated_project.data
+        self.assets = updated_project.assets
+        self.asset_count = updated_project.asset_count
+        self.prompts = updated_project.prompts
+        self.scripts = updated_project.scripts
