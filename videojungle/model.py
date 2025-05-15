@@ -365,6 +365,14 @@ class Asset(BaseModel):
     status: Optional[str]
     uploaded: bool
 
+    @property
+    def is_analyzing(self) -> bool:
+        """
+        Checks if the asset is still being analyzed.
+        Returns True if the asset type is 'user' and status indicates it's in analysis process, False otherwise.
+        """
+        return self.asset_type == "user" and self.status in ["uploaded", "processing", "queued", None] and not self.status == "analyzed"
+
 class Project(BaseModel):
     id: str
     name: str
@@ -376,3 +384,18 @@ class Project(BaseModel):
     assets: List[Asset]
     prompts: List[dict]
     scripts: List[Script]
+
+    @property
+    def has_analyzing_assets(self) -> bool:
+        """
+        Checks if the project has any assets that are still being analyzed.
+        Returns True if at least one asset is still being analyzed, False otherwise.
+        """
+        return any(asset.is_analyzing for asset in self.assets)
+
+    @property
+    def analyzing_assets(self) -> List[Asset]:
+        """
+        Returns a list of all assets that are still being analyzed.
+        """
+        return [asset for asset in self.assets if asset.is_analyzing]
