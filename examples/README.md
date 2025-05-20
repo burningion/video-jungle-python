@@ -4,6 +4,8 @@ This directory contains examples of projects using the Video Jungle API to creat
 
 [analyze_video.py](./analyze_video.py) - CLI to download a video from a URL and analyze it for search and retrieval. (Requires [typer](https://typer.tiangolo.com/): `pip install typer`)
 
+[create_project_with_template.py](./create_project_with_template.py) - Create a project with a specific script template key to determine the generation flow.
+
 [generate_edit.py](./generate_edit.py) - Generate a video edit from a set of VideoFiles
 
 [generate_horoscope.py](./generate_horoscope.py) - Creates a horoscope generator that takes in a date, zodiac sign, and lucky number for video horoscope generation.

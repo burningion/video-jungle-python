@@ -65,10 +65,17 @@ class ProjectsAPI:
         return projects
     
     def create(self, name: str, description: str, prompt_id=None, generation_method: str = "prompt-to-video"):
+        project_params = {
+            "name": name,
+            "description": description,
+            "data": generation_method,
+            "template_key": generation_method
+        }
+        
         if prompt_id:
-            project_data = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "prompt_id": prompt_id, "data": generation_method})
-        else:
-            project_data = self.client._make_request("POST", "/projects", json={"name": name, "description": description, "data": generation_method})
+            project_params["prompt_id"] = prompt_id
+            
+        project_data = self.client._make_request("POST", "/projects", json=project_params)
         
         # Use get method which already sets the _client attribute
         return self.get(project_data["id"])
@@ -81,7 +88,10 @@ class ProjectsAPI:
         Updates the project data by fetching the latest information from the server
         Returns the updated project
         '''
-        return self.get(project_id)
+        updated_project = self.get(project_id)
+        # Ensure the client is properly set on the returned project
+        updated_project._client = self.client
+        return updated_project
     
     def generate(self, project_id: str, script_id: str, parameters: dict):
         '''
@@ -180,8 +190,10 @@ class AssetsAPI:
             uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], 
                                                 files={"file": (filename, file_object)})
         
-        # Update project data after upload
-        self.client.projects.update_project_data(project_id)
+        # Update project data after upload and store reference to updated project
+        updated_project = self.client.projects.update_project_data(project_id)
+        
+        # Get the newly uploaded asset
         return self.get(uploaded["id"])
     
     def add_asset_from_video_file(self, video_file_id: str, project_id: str, start_time: Optional[float] = None, end_time: Optional[float] = None):

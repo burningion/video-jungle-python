@@ -341,6 +341,8 @@ class Script(BaseModel):
     inputs: List[dict]
     name: str
     created_at: str 
+    key: Optional[str] = ""
+    manuscript: Optional[str] = ""
 
 class Prompt(BaseModel):
     id: str
@@ -471,17 +473,21 @@ class Project(BaseModel):
         self.assets.append(asset)
         self.asset_count += 1
         
-        # Update project data after upload
+        # Update project data after upload and maintain this project's state
         self.update_project_data(api_client)
         
+        # Return the uploaded asset
         return asset
         
-    def update_project_data(self, client: Optional[Any] = None) -> None:
+    def update_project_data(self, client: Optional[Any] = None) -> 'Project':
         """
         Updates the project data with the latest information from the server.
         
         Args:
             client: Optional ApiClient instance. If not provided, uses the previously set client.
+            
+        Returns:
+            Project: The updated project (self)
             
         Raises:
             ValueError: If no client is available and none is provided
@@ -495,6 +501,9 @@ class Project(BaseModel):
         # Get updated project data
         updated_project = api_client.projects.get(self.id)
         
+        # Preserve the client reference
+        original_client = self._client
+        
         # Update project properties
         self.name = updated_project.name
         self.description = updated_project.description
@@ -503,3 +512,8 @@ class Project(BaseModel):
         self.asset_count = updated_project.asset_count
         self.prompts = updated_project.prompts
         self.scripts = updated_project.scripts
+        
+        # Ensure we keep the original client reference
+        self._client = original_client
+        
+        return self
