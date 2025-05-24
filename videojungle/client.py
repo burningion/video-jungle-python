@@ -1,7 +1,7 @@
 import requests
 from urllib import parse
 from typing import List, Optional, Any
-from .model import VideoFile, Script, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset
+from .model import VideoFile, Script, ScriptTemplate, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset
 from .utils import is_youtube_url
 import time
 from datetime import datetime
@@ -382,7 +382,7 @@ class ScriptsAPI:
     
     def list_options(self):
         obj = self.client._make_request("GET", "/scripts")
-        return [Script(**script) for script in obj]
+        return [ScriptTemplate(**script) for script in obj]
     
     def list(self, project_id: str):
         obj = self.client._make_request("GET", f"/projects/{project_id}/scripts")

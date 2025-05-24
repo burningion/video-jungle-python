@@ -334,6 +334,16 @@ class User(BaseModel):
     is_verified: bool
     is_active: bool
 
+class ScriptTemplate(BaseModel):
+    id: str
+    name: str
+    key: str
+    manuscript: str
+    created_at: str
+    updated_at: str
+    description: str
+    template: dict
+
 class Script(BaseModel):
     id: str
     project_id: str
