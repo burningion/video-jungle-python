@@ -21,15 +21,15 @@ print(prompt.value)
 
 # Optionally, list out scripts available as generation methods
 scripts = vj.scripts.list_options()
-print(scripts)
+for script in scripts:
+    print(f"{script.key}: {script.description}")
+
 
 # Create a project to hold generated files, using our prompt we've generated
 project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt.id)
 
 # Get first script for the generation process
-# (Scripts define the video generation method from a prompt)
-script = project.scripts[0]
-script_id = script.id
+script_id = "prompt-to-video"
 
 # Print out parameters required for generation
 print(project.prompts[0]['parameters'])
