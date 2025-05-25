@@ -19,18 +19,17 @@ prompt = vj.prompts.generate(task="a horoscope reader who wants to leave the per
 # Print out the generated prompt
 print(prompt.value)
 
-# Optionally, list out scripts available as generation methods
+# Optionally, list out  generation methods available in your account
 scripts = vj.scripts.list_options()
 for script in scripts:
     print(f"{script.key}: {script.description}")
 
-
 # Create a project to hold generated files, using our prompt we've generated
-project = vj.projects.create(name="First Project", description="My first project", prompt_id=prompt.id)
+# and prompt-to-video as the asset genneration method
+project = vj.projects.create(name="First Project", description="My first project", 
+                             prompt_id=prompt.id, generation_method="prompt-to-video")
 
-# Get first script for the generation process
-script_id = "prompt-to-video"
-
+script_id = project.scripts[0].id
 # Print out parameters required for generation
 print(project.prompts[0]['parameters'])
 
@@ -38,8 +37,8 @@ print(project.prompts[0]['parameters'])
 video = vj.projects.generate(script_id=script_id, 
                              project_id=project.id,
                              parameters={"zodiac sign": "Aries",
-                                         "lucky number": "7",
-                                         "date": ""2025-04-24""})
+                                         "lucky number": "7", # parameters are always strings
+                                         "date": "2025-05-25"})
 print(video)
 
 # Get the video file ID from the generated video

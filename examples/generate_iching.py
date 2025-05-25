@@ -85,7 +85,7 @@ if choice == "New":
     # Get first script for the generation process
     # (Scripts define the video generation method from a prompt)
     script = project.scripts[0]
-    script_id = script.id
+    script_id = "prompt-to-video" # script.id
 else:
     # Select an existing project
     projects = vj.projects.list()
