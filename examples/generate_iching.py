@@ -80,12 +80,11 @@ if choice == "New":
 
     # Create a project to hold generated files, using our prompt we've generated
 
-    project = vj.projects.create(name=name, description=description, prompt_id=prompt.id)
+    project = vj.projects.create(name=name, description=description, prompt_id=prompt.id, generation_method="prompt-to-video")
 
     # Get first script for the generation process
     # (Scripts define the video generation method from a prompt)
-    script = project.scripts[0]
-    script_id = "prompt-to-video" # script.id
+    script_id = project.scripts[0].id
 else:
     # Select an existing project
     projects = vj.projects.list()
