@@ -435,7 +435,8 @@ class EditAPI:
                     output_format: str = "mp4",
                     output_resolution: str = "1920x1080",
                     output_fps: float = 30.0,
-                    skip_rendering: bool = False
+                    skip_rendering: bool = False,
+                    subtitles: bool = True
                 ) -> dict:
         """
         Create a video edit with multiple clips.
@@ -452,6 +453,8 @@ class EditAPI:
             output_format: Output format (default: mp4)
             output_resolution: Output resolution (default: 1920x1080)
             output_fps: Output frames per second (default: 30.0)
+            skip_rendering: Skip rendering the edit (default: False)
+            subtitles: Enable subtitle generation for the render (default: True)
             
         Returns:
             Response from the API
@@ -502,7 +505,8 @@ class EditAPI:
             video_output_filename=f"{name or 'video'}.{output_format}",
             video_series_sequential=video_series,
             audio_overlay=[],  # Empty list as default
-            skip_rendering=skip_rendering  # If true don't render yet
+            skip_rendering=skip_rendering,  # If true don't render yet
+            subtitles=subtitles  # Enable subtitle generation if specified
         )
     
         return self.create_edit(project_id, edit)

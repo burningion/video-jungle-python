@@ -325,6 +325,11 @@ class VideoEditCreate(BaseModel):
         title="Audio Overlays",
         description="List of audio assets to overlay on the video sequence.",
     )
+    subtitles: Optional[bool] = Field(
+        True,
+        title="Enable Subtitles",
+        description="Whether to generate and add subtitles to the rendered video. Defaults to True.",
+    )
 
 class User(BaseModel):
     id: str
