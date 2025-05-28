@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
-from typing import List, Optional, Set, Any
+from pydantic import BaseModel, Field, field_validator
+from typing import List, Optional, Set, Any, Union
 from datetime import time, datetime
 from uuid import UUID
+import json
 
 class DurationFilter(BaseModel):
     """Model representing duration filter constraints for video search."""
@@ -378,9 +379,22 @@ class Asset(BaseModel):
     created_at: str
     description: Optional[str]
     generated_description: Optional[str]
-    create_parameters: Optional[dict]
+    create_parameters: Optional[Union[dict, str]]
     status: Optional[str]
     uploaded: bool
+    
+    @field_validator('create_parameters', mode='before')
+    @classmethod
+    def parse_create_parameters(cls, v):
+        if v is None:
+            return None
+        if isinstance(v, str):
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                # If it's not valid JSON, return the string as-is
+                return v
+        return v
 
     @property
     def is_analyzing(self) -> bool:
