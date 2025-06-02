@@ -3,3 +3,4 @@ build/
 dist/
 videojungle.egg-info/
 videojungle/__pycache__/
+*.pyc
