@@ -168,6 +168,14 @@ class VideoSearch(BaseModel):
             query_img=query_img
         )
 
+class PublicLinkInfo(BaseModel):
+    """Model representing public link information for a video."""
+    url: str
+    requires_key: bool
+    access_count: int
+    last_accessed: Optional[datetime]
+    created_at: datetime
+
 class VideoFile(BaseModel):
     id: str
     filename: str
@@ -183,7 +191,12 @@ class VideoFile(BaseModel):
     recorded_at: Optional[str]
     key: str
     analysis: List[dict]
+    url: Optional[str] = None
+    current_status: Optional[str] = None
     download_url: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    has_redirect: bool = False
+    public_link: Optional[PublicLinkInfo] = None
     # embeddings: List[dict]
 
 class VideoUpload(BaseModel):
