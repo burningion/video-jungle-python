@@ -345,6 +345,23 @@ class VideoEditCreate(BaseModel):
         description="Whether to generate and add subtitles to the rendered video. Defaults to True.",
     )
 
+class CustomPromptGeneration(BaseModel):
+    prompt: str = Field(
+        ...,
+        title="Prompt",
+        description="The prompt to use for generation.",
+    )
+    prompt_persona: str = Field(
+        ...,
+        title="Prompt Persona",
+        description="The persona to use for the prompt.",
+    )
+    render_prompt: Optional[bool] = Field(
+        True,
+        title="Render Prompt",
+        description="Whether to render the prompt or just return it.",
+    )
+
 class User(BaseModel):
     id: str
     email: str

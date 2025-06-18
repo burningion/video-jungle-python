@@ -1,7 +1,7 @@
 import requests
 from urllib import parse
 from typing import List, Optional, Any
-from .model import VideoFile, Script, ScriptTemplate, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset
+from .model import VideoFile, Script, ScriptTemplate, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset, CustomPromptGeneration
 from .utils import is_youtube_url
 import time
 from datetime import datetime
@@ -100,6 +100,18 @@ class ProjectsAPI:
         '''
         parsed_parameters = parse.urlencode(parameters)
         return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/generate?{parsed_parameters}")
+    
+    def generate_from_prompt(self, project_id: str, script_id: str, prompt: str, prompt_persona: str):
+        '''
+        Generate a video using a custom prompt without rendering it
+        Returns the prompt information without generating the video
+        '''
+        custom_prompt = CustomPromptGeneration(
+            prompt=prompt,
+            prompt_persona=prompt_persona,
+            render_prompt=False
+        )
+        return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/prompt", json=custom_prompt.model_dump())
     
     def render_edit(self, project_id: str, create_edit: dict):
         '''
