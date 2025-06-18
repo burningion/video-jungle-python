@@ -351,13 +351,13 @@ class CustomPromptGeneration(BaseModel):
         title="Prompt",
         description="The prompt to use for generation.",
     )
-    prompt_persona: str = Field(
-        ...,
+    prompt_persona: Optional[str] = Field(
         title="Prompt Persona",
         description="The persona to use for the prompt.",
+        default="",
     )
     render_prompt: Optional[bool] = Field(
-        True,
+        False,
         title="Render Prompt",
         description="Whether to render the prompt or just return it.",
     )
