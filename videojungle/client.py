@@ -101,7 +101,7 @@ class ProjectsAPI:
         parsed_parameters = parse.urlencode(parameters)
         return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/generate?{parsed_parameters}")
     
-    def generate_from_prompt(self, project_id: str, script_id: str, prompt: str, prompt_persona: str):
+    def generate_from_prompt(self, project_id: str, script_id: str, prompt: str, prompt_persona: Optional[str] = None):
         '''
         Generate a video using a custom prompt without rendering it
         Returns the prompt information without generating the video
