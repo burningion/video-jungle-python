@@ -1,5 +1,5 @@
 from .client import ApiClient
-from .model import VideoSearch, VideoFile, VideoEditAsset, VideoEditAudioAsset, VideoFilters, VideoEditCreate, VideoUpload
+from .model import VideoSearch, VideoFile, VideoEditAsset, VideoEditAudioAsset, VideoFilters, VideoEditCreate, VideoUpload, VideoAudioLevel
 
 try:
     from importlib.metadata import version

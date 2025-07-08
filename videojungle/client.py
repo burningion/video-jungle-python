@@ -108,10 +108,45 @@ class ProjectsAPI:
         '''
         custom_prompt = CustomPromptGeneration(
             prompt=prompt,
-            prompt_persona=prompt_persona,
+            prompt_persona=prompt_persona if prompt_persona is not None else "",
             render_prompt=False
         )
         return self.client._make_request("POST", f"/projects/{project_id}/{script_id}/prompt", json=custom_prompt.model_dump())
+    
+    def generate_with_custom_prompt(self, project_id: str, script_id: str, prompt: str, prompt_persona: Optional[str] = None, render_prompt: bool = False, **params):
+        '''
+        Generate a video asset using custom prompt and parameters
+        
+        Args:
+            project_id: UUID of the project
+            script_id: UUID of the script
+            prompt: The custom prompt text to use for generation
+            prompt_persona: Optional persona for the prompt
+            render_prompt: Whether to render the prompt statically (default: False)
+            **params: Additional query parameters (e.g., burn_subtitles, vj_media_gen, vj_video_1, vj_audio_1)
+            
+        Returns:
+            dict: Asset generation response containing asset_id, file_key, and asset_key
+        '''
+        custom_prompt = CustomPromptGeneration(
+            prompt=prompt,
+            prompt_persona=prompt_persona if prompt_persona is not None else "",
+            render_prompt=render_prompt
+        )
+        
+        # Build query parameters from kwargs
+        query_params = {k: str(v) for k, v in params.items() if v is not None}
+        
+        # Construct query string if params exist
+        query_string = ""
+        if query_params:
+            query_string = "?" + parse.urlencode(query_params)
+        
+        return self.client._make_request(
+            "POST", 
+            f"/projects/{project_id}/{script_id}/generate{query_string}",
+            json=custom_prompt.model_dump()
+        )
     
     def render_edit(self, project_id: str, create_edit: dict):
         '''
