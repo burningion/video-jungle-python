@@ -1,7 +1,7 @@
 import requests
 from urllib import parse
 from typing import List, Optional, Any
-from .model import VideoFile, Script, ScriptTemplate, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset, CustomPromptGeneration
+from .model import VideoFile, Script, ScriptTemplate, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset, CustomPromptGeneration, CropSettings
 from .utils import is_youtube_url
 import time
 from datetime import datetime
@@ -168,7 +168,7 @@ class ProjectsAPI:
         Create a new edit within a project for editing before rendering
         Returns same as above
         '''
-        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit.model_dump_json())
+        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit.model_dump())
     
     def get_edit(self, project_id: str, edit_id: str):
         '''
@@ -470,8 +470,7 @@ class EditAPI:
         Create a new edit within a project for editing before rendering
         Returns same as above
         '''
-        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", data=create_edit.model_dump_json(),
-                                         headers={"Content-Type": "application/json"})
+        return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit.model_dump())
 
     def create_edit_from_clips(
                     self, 
@@ -495,6 +494,10 @@ class EditAPI:
                 - type: Asset type (string, default: "videofile")
                 - start_time: Start time in 00:00:00.000 format (string)
                 - end_time: End time in 00:00:00.000 format (string)
+                - crop: Optional crop settings (dict) containing:
+                    - zoom: Zoom factor (float, default: 1.0, range: 0.1-10.0)
+                    - position_x: Horizontal offset (float, default: 0.0, range: -1.0 to 1.0)
+                    - position_y: Vertical offset (float, default: 0.0, range: -1.0 to 1.0)
             name: Optional name for the edit
             description: Optional description for the edit
             output_format: Output format (default: mp4)
@@ -515,6 +518,7 @@ class EditAPI:
             clip_type = clip.get("type", "videofile")
             start_time = clip.get("start_time")
             end_time = clip.get("end_time")
+            crop = clip.get("crop")
             
             # Validate required fields
             if not video_id:
@@ -530,13 +534,23 @@ class EditAPI:
             except ValueError:
                 raise ValueError(f"Invalid id: {video_id}")
             
+            # Create CropSettings if crop data is provided
+            crop_settings = None
+            if crop:
+                crop_settings = CropSettings(
+                    zoom=crop.get("zoom", 1.0),
+                    position_x=crop.get("position_x", 0.0),
+                    position_y=crop.get("position_y", 0.0)
+                )
+            
             # Create video asset
             video_asset = VideoEditAsset(
                 video_id=video_uuid,
                 type=clip_type,
                 video_start_time=start_time,
                 video_end_time=end_time,
-                audio_levels=[]  # Empty list as default
+                audio_levels=[],  # Empty list as default
+                crop=crop_settings
             )
             
             video_series.append(video_asset)

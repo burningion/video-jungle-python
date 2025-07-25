@@ -263,6 +263,12 @@ class VideoEditAudioAsset(BaseModel):
         description="List of audio level measurements for this asset.",
     )
 
+class CropSettings(BaseModel):
+    """Crop/zoom settings for a video asset, similar to DaVinci Resolve"""
+    zoom: float = Field(1.0, ge=0.1, le=10.0, description="Zoom factor (1.0 = 100%, 1.5 = 150%, etc.)")
+    position_x: float = Field(0.0, ge=-1.0, le=1.0, description="Horizontal offset from center (-1.0 to 1.0)")
+    position_y: float = Field(0.0, ge=-1.0, le=1.0, description="Vertical offset from center (-1.0 to 1.0)")
+
 class VideoEditAsset(BaseModel):
     """Model representing a video asset in an edit sequence."""
     video_id: UUID = Field(
@@ -289,6 +295,11 @@ class VideoEditAsset(BaseModel):
         ...,
         title="Audio Levels",
         description="List of audio level measurements for this video segment (0..1).",
+    )
+    crop: Optional[CropSettings] = Field(
+        None,
+        title="Crop Settings",
+        description="Optional crop/zoom settings for this video segment.",
     )
 
 class VideoEditCreate(BaseModel):
