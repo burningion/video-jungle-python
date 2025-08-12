@@ -70,7 +70,7 @@ class VideoFilters(BaseModel):
         if duration_min is not None or duration_max is not None:
             duration = DurationFilter(
                 min=duration_min if duration_min is not None else 0,
-                max=duration_max if duration_max is not None else float('inf')
+                max=duration_max if duration_max is not None else 99999999
             )
 
         return cls(
@@ -141,13 +141,10 @@ class VideoSearch(BaseModel):
                query_audio: Optional[str] = None,
                query_img: Optional[str] = None) -> 'VideoSearch':
         
-        if duration_min and duration_max and duration_min > duration_max:
-            dur = DurationFilter(min=duration_max, max=duration_min)
-        else:
-            dur = None
-        # Create filters if any filter parameters are provided
-        filters = VideoFilters(
-            duration=dur,
+        # Create filters using the proper create method
+        filters = VideoFilters.create(
+            duration_min=duration_min,
+            duration_max=duration_max,
             created_after=created_after,
             created_before=created_before,
             tags=tags,

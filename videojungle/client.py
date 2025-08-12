@@ -237,8 +237,6 @@ class AssetsAPI:
             uploaded = self.client._make_request("POST", upload_link["upload_url"]["url"], 
                                                 files={"file": (filename, file_object)})
         
-        # Update project data after upload and store reference to updated project
-        updated_project = self.client.projects.update_project_data(project_id)
         
         # Get the newly uploaded asset
         return self.get(uploaded["id"])
@@ -335,8 +333,8 @@ class VideoFileAPI:
             query_audio=query_audio,
             query_img=query_img
         )
-        # Make the request
-        return self.client._make_request("POST", "/video-file/search", json=vs.model_dump())
+        # Make the request - use mode='json' to ensure proper serialization
+        return self.client._make_request("POST", "/video-file/search", json=vs.model_dump(mode='json'))
     
     def download(self, video_id: str, filename: str):
         video = self.get(video_id)
