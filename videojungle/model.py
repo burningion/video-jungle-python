@@ -352,6 +352,11 @@ class VideoEditCreate(BaseModel):
         title="Enable Subtitles",
         description="Whether to generate and add subtitles to the rendered video. Defaults to True.",
     )
+    auto_vertical_crop: Optional[str] = Field(
+        default=None,
+        description="Automatically crop video to focus on main subjects. Available presets: 'standard', 'tight', 'loose'. Use 'standard' for balanced cropping, 'tight' for closer focus, 'loose' for wider view. Set to None to disable auto-cropping.",
+        example="standard"
+    )
 
 class CustomPromptGeneration(BaseModel):
     prompt: str = Field(
