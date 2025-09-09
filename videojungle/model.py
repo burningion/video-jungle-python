@@ -447,6 +447,40 @@ class Asset(BaseModel):
         """
         return self.asset_type == "user" and self.status in ["uploaded", "processing", "queued", None] and not self.status == "analyzed"
 
+class Collaborator(BaseModel):
+    user_id: str = Field(
+        ...,
+        title="User ID",
+        description="Unique identifier for the collaborator user.",
+    )
+    email: str = Field(
+        ...,
+        title="Email",
+        description="Email address of the collaborator.",
+    )
+    name: Optional[str] = Field(
+        None,
+        title="Name",
+        description="Display name of the collaborator.",
+    )
+    added_at: Optional[str] = Field(
+        None,
+        title="Added At",
+        description="Timestamp when the collaborator was added.",
+    )
+    added_by: Optional[str] = Field(
+        None,
+        title="Added By",
+        description="User ID of who added this collaborator.",
+    )
+
+class CollaboratorRequest(BaseModel):
+    collaborator_email: str = Field(
+        ...,
+        title="Collaborator Email",
+        description="Email address of the user to add as a collaborator.",
+    )
+
 class Project(BaseModel):
     id: str
     name: str

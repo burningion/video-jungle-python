@@ -1,7 +1,7 @@
 import requests
 from urllib import parse
 from typing import List, Optional, Any
-from .model import VideoFile, Script, ScriptTemplate, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset, CustomPromptGeneration, CropSettings
+from .model import VideoFile, Script, ScriptTemplate, Prompt, Project, Asset, User, VideoSearch, VideoFilters, DurationFilter, VideoEditCreate, VideoEditAsset, CustomPromptGeneration, CropSettings, Collaborator, CollaboratorRequest
 from .utils import is_youtube_url
 import time
 from datetime import datetime
@@ -181,6 +181,72 @@ class ProjectsAPI:
         Returns a list of edits within a project
         '''
         return self.client._make_request("GET", f"/projects/{project_id}/edits")
+    
+    def add_collaborator(self, project_id: str, edit_id: str, collaborator_email: str):
+        '''
+        Add a collaborator to a video edit. Only the owner can add collaborators.
+        
+        Args:
+            project_id: UUID of the project
+            edit_id: UUID of the edit
+            collaborator_email: Email address of the user to add as a collaborator
+            
+        Returns:
+            dict: Response from the API
+            
+        Raises:
+            ValueError: If the user is already a collaborator or other business logic error
+        '''
+        request_data = CollaboratorRequest(collaborator_email=collaborator_email)
+        try:
+            return self.client._make_request(
+                "POST",
+                f"/projects/{project_id}/edits/{edit_id}/collaborators",
+                json=request_data.model_dump()
+            )
+        except requests.exceptions.HTTPError as e:
+            if e.response.status_code == 400:
+                try:
+                    error_detail = e.response.json()
+                    error_message = error_detail.get('detail', 'Bad request')
+                    raise ValueError(error_message)
+                except ValueError as json_error:
+                    if "Bad request" in str(json_error):
+                        raise json_error
+                    raise ValueError("Bad request - unable to parse error details")
+            else:
+                raise e
+    
+    def list_collaborators(self, project_id: str, edit_id: str):
+        '''
+        List all collaborators for a video edit. Accessible by owner and collaborators.
+        
+        Args:
+            project_id: UUID of the project
+            edit_id: UUID of the edit
+            
+        Returns:
+            List[Collaborator]: List of collaborators
+        '''
+        response = self.client._make_request("GET", f"/projects/{project_id}/edits/{edit_id}/collaborators")
+        return [Collaborator(**collaborator) for collaborator in response["collaborators"]]
+    
+    def remove_collaborator(self, project_id: str, edit_id: str, user_id: str):
+        '''
+        Remove a collaborator from a video edit. Only the owner can remove collaborators.
+        
+        Args:
+            project_id: UUID of the project
+            edit_id: UUID of the edit
+            user_id: UUID of the user to remove from collaborators
+            
+        Returns:
+            dict: Response from the API
+        '''
+        return self.client._make_request(
+            "DELETE",
+            f"/projects/{project_id}/edits/{edit_id}/collaborators/{user_id}"
+        )
 
 
 class AssetsAPI:

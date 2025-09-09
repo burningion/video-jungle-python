@@ -77,6 +77,23 @@ print(f"Video generated and saved to: {video_file}")
 
 This example lives in the `examples/` folder.
 
+## Collaboration Features
+
+You can add collaborators to video edits to share editing access:
+
+```python
+# Add a collaborator to an edit (owner only)
+client.projects.add_collaborator("project_uuid", "edit_id", "collaborator@example.com")
+
+# List all collaborators for an edit
+collaborators = client.projects.list_collaborators("project_uuid", "edit_id")
+for collaborator in collaborators:
+    print(f"{collaborator.name} ({collaborator.email})")
+
+# Remove a collaborator from an edit (owner only)
+client.projects.remove_collaborator("project_uuid", "edit_id", "user_id")
+```
+
 ## License
 
 This project is licensed under the MIT License.
