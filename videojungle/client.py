@@ -537,8 +537,8 @@ class EditAPI:
         return self.client._make_request("POST", f"/projects/{project_id}/create-edit", json=create_edit.model_dump())
 
     def create_edit_from_clips(
-                    self, 
-                    project_id: str, 
+                    self,
+                    project_id: str,
                     clips: list[dict],
                     name: str = "",
                     description: str = "",
@@ -546,7 +546,7 @@ class EditAPI:
                     output_resolution: str = "1920x1080",
                     output_fps: float = 30.0,
                     skip_rendering: bool = False,
-                    subtitles: bool = True,
+                    subtitle_from_audio_overlay: bool = True,
                     auto_vertical_crop: Optional[str] = None
                 ) -> dict:
         """
@@ -569,7 +569,7 @@ class EditAPI:
             output_resolution: Output resolution (default: 1920x1080)
             output_fps: Output frames per second (default: 30.0)
             skip_rendering: Skip rendering the edit (default: False)
-            subtitles: Enable subtitle generation for the render (default: True)
+            subtitle_from_audio_overlay: Enable subtitle generation for the render (default: True)
             auto_vertical_crop: Automatically crop video to focus on main subjects. Available presets: 'standard', 'tight', 'loose' (default: None)
             
         Returns:
@@ -633,7 +633,7 @@ class EditAPI:
             video_series_sequential=video_series,
             audio_overlay=[],  # Empty list as default
             skip_rendering=skip_rendering,  # If true don't render yet
-            subtitles=subtitles,  # Enable subtitle generation if specified
+            subtitle_from_audio_overlay=subtitle_from_audio_overlay,  # Enable subtitle generation if specified
             auto_vertical_crop=auto_vertical_crop  # Auto crop setting
         )
     

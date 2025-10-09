@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import List, Optional, Set, Any, Union
+from typing import List, Optional, Set, Any, Union, Dict
 from datetime import time, datetime
 from uuid import UUID
 import json
@@ -347,7 +347,7 @@ class VideoEditCreate(BaseModel):
         title="Audio Overlays",
         description="List of audio assets to overlay on the video sequence.",
     )
-    subtitles: Optional[bool] = Field(
+    subtitle_from_audio_overlay: Optional[bool] = Field(
         True,
         title="Enable Subtitles",
         description="Whether to generate and add subtitles to the rendered video. Defaults to True.",
@@ -485,7 +485,7 @@ class Project(BaseModel):
     id: str
     name: str
     description: Optional[str]
-    data: Optional[str]
+    data: Optional[Union[str, Dict[str, Any]]]
     created_at: str
     owner_id: str
     asset_count: int

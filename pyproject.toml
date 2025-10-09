@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "videojungle"
-version = "0.1.79"
+version = "0.1.80"
 dependencies = [
     "requests",
     "pydantic",
