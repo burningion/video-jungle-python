@@ -4,6 +4,8 @@ This directory contains examples of projects using the Video Jungle API to creat
 
 [analyze_video.py](./analyze_video.py) - CLI to download a video from a URL and analyze it for search and retrieval. (Requires [typer](https://typer.tiangolo.com/): `pip install typer`)
 
+[direct_upload_and_analyze.py](./direct_upload_and_analyze.py) - Create a video using a presigned POST (direct S3 upload), then start analysis; optionally subscribe to status updates via SSE.
+
 [create_project_with_template.py](./create_project_with_template.py) - Create a project with a specific script template key to determine the generation flow.
 
 [generate_edit.py](./generate_edit.py) - Generate a video edit from a set of VideoFiles
